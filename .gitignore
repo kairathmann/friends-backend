@@ -1,0 +1,17 @@
+*.pyc
+.idea/
+.vscode/
+db.sqlite3
+venv/
+
+#======================================
+# OS generated
+#--------------------------------------
+__MACOSX/
+.DS_Store
+Thumbs.db
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
