@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/self/', views.Self.as_view(), name='self'),
+    path('api/v1/self/responses/', views.SelfResponses.as_view(), name='self_responses'),
+    path('api/v1/self/questions/', views.SelfQuestions.as_view(), name='self_questions'),
+
+    # Naming inspired by the Twilio tutorial API from https://github.com/TwilioDevEd/account-security-quickstart-django
+    path('api/v1/verification/', views.Verification.as_view(), name='verification'),
+    path('api/v1/verification/token/', views.VerificationToken.as_view(), name='verification_token'),
 ]

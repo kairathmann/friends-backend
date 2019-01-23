@@ -1,0 +1,5 @@
+authy
+awsebcli
+Django
+djangorestframework
+phonenumbers

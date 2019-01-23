@@ -26,7 +26,8 @@ SECRET_KEY = '!3c79l6!v87bj!9*s__uc-)bzbgo^*7h7+4+kh2^9^6=ohv(2%'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    ".elasticbeanstalk.com",
+    'localhost',
+    '.elasticbeanstalk.com',
 ]
 
 
@@ -39,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'friends',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +124,33 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AUTH_USER_MODEL = 'friends.LunaUser'
+
+AUTHENTICATION_BACKENDS = [
+    # Permissions Backends
+    "symposion.teams.backends.TeamPermissionsBackend",
+
+    # Auth backends
+    "account.auth_backends.EmailAuthenticationBackend",
+
+    # Allow admin login without email
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Phone verification
+
+# Disabling Authy for development
+AUTHY_DISABLE = int(os.environ['AUTHY_DISABLE'])
+
+# Authy Application Key
+AUTHY_ACCOUNT_SECURITY_API_KEY = os.environ['AUTHY_ACCOUNT_SECURITY_API_KEY']
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'friends.authentication.BearerTokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
