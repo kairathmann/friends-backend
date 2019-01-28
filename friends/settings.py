@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '.elasticbeanstalk.com',
+    '*',  # TODO support AWS health checker
 ]
 
 
