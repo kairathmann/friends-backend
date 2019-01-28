@@ -10,6 +10,8 @@ class TestCaseWithAuthenticatedUser(TestCase):
     def setUp(self):
         self.user = models.LunaUser.objects.create_user(
             username='test',
+            city='test-city',
+            first_name='Test Name',
             email='test@example.com',
             password='test')
         self.token = Token.objects.get(user=self.user).key
@@ -67,6 +69,23 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'first_name_missing')
+
+    def test_get(self):
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('username'), 'test')
+        self.assertEqual(response.data.get('city'), 'test-city')
+        self.assertEqual(response.data.get('first_name'), 'Test Name')
+
+    def test_get_401(self):
+        response = self.client.get(
+            reverse_lazy(self.view())
+        )
+        self.assertEqual(response.status_code, 401)
 
 
 class TestCaseWithSurvey(TestCaseWithAuthenticatedUser):

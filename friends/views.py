@@ -16,6 +16,10 @@ import phonenumbers
 
 class Self(APIView):
 
+    def get(self, request):
+        serializer = serializers.LunaUserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @transaction.atomic
     def put(self, request):
         city = request.data.get('city')
