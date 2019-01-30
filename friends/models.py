@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
+from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 CITY_MAX_LENGTH = 35
@@ -63,3 +64,20 @@ class SurveyResponse(models.Model):
     answer = models.ForeignKey(SurveyAnswer, on_delete=models.CASCADE)
 
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+
+
+class Round(models.Model):
+    """
+    A Round is one iteration of an experiment pairing users with one another.
+    """
+
+    start_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+
+    end_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+
+    description = models.TextField(blank=True)
+
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='rounds', blank=True)
+
+    class Meta:
+        ordering = ['start_timestamp', ]

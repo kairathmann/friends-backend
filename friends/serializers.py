@@ -43,3 +43,25 @@ class SurveyResponseSerializer(serializers.ModelSerializer):
             'answer',
             'timestamp',
         ]
+
+
+class RoundSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Round
+        fields = [
+            'id',
+            'start_timestamp',
+            'end_timestamp',
+            'description',
+            'is_subscribed',
+        ]
+
+    def get_is_subscribed(self, obj):
+        """
+        Getter for the custom field 'is_subscribed'.
+        :param obj: The Round object.
+        :return: The contents of the custom field 'is_subscribed'.
+        """
+        return obj.users.filter(id=self.context.get('request').user.id).exists()

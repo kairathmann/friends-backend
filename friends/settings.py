@@ -128,17 +128,6 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'friends.LunaUser'
 
-AUTHENTICATION_BACKENDS = [
-    # Permissions Backends
-    "symposion.teams.backends.TeamPermissionsBackend",
-
-    # Auth backends
-    "account.auth_backends.EmailAuthenticationBackend",
-
-    # Allow admin login without email
-    'django.contrib.auth.backends.ModelBackend',
-]
-
 # Phone verification
 
 # Disabling Authy for development
