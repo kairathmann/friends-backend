@@ -25,6 +25,9 @@ urlpatterns = [
     path('api/v1/self/responses/', views.SelfResponses.as_view(), name='self_responses'),
     path('api/v1/self/questions/', views.SelfQuestions.as_view(), name='self_questions'),
 
+    # For migrating Telegram users to Luminos
+    path('api/v1/legacy/', views.Legacy.as_view(), name='legacy'),
+
     # Naming inspired by the Twilio tutorial API from https://github.com/TwilioDevEd/account-security-quickstart-django
     path('api/v1/verification/', views.Verification.as_view(), name='verification'),
     path('api/v1/verification/token/', views.VerificationToken.as_view(), name='verification_token'),

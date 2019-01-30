@@ -18,7 +18,7 @@ class TestCaseWithAuthenticatedUser(TestCase):
         self.header = {'HTTP_AUTHORIZATION': "Bearer {}".format(self.token)}
 
     def tearDown(self):
-        self.user.delete()
+        models.LunaUser.objects.all().delete()
 
 
 class TestCaseWithRounds(TestCaseWithAuthenticatedUser):
@@ -279,11 +279,16 @@ class TestCaseWithSurvey(TestCaseWithAuthenticatedUser):
             text='text2b',
             order_index=0,
         )
+        self.response2 = models.SurveyResponse.objects.create(
+            user=self.user,
+            answer=self.answer2a,
+        )
 
     def tearDown(self):
         super(TestCaseWithSurvey, self).tearDown()
         self.question1.delete()
         self.question2.delete()
+        self.response2.delete()
 
 
 class SelfResponsesTest(TestCaseWithSurvey):
@@ -301,7 +306,7 @@ class SelfResponsesTest(TestCaseWithSurvey):
             **self.header,
         )
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual(models.SurveyResponse.objects.count(), 1)
+        self.assertEqual(models.SurveyResponse.objects.count(), 2)
         models.SurveyResponse.objects.all().delete()
 
     def test_post_401(self):
@@ -351,9 +356,14 @@ class SelfQuestionsTest(TestCaseWithSurvey):
         return 'self_questions'
 
     def test_get(self):
-        response = self.client.get(reverse_lazy(self.view()))
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
         self.assertEqual(response.status_code, 200)
-        # Questions can be in any order but their respective answers must be sorted by order_index
+        # Only include questions that haven't been answered by the user yet
         self.assertIn({
             'id': self.question1.id,
             'text': self.question1.text,
@@ -368,7 +378,7 @@ class SelfQuestionsTest(TestCaseWithSurvey):
                 }
             ]
         }, response.data)
-        self.assertIn({
+        self.assertNotIn({
             'id': self.question2.id,
             'text': self.question2.text,
             'answers': [
@@ -382,3 +392,149 @@ class SelfQuestionsTest(TestCaseWithSurvey):
                 }
             ]
         }, response.data)
+
+
+class TestCaseWithLegacy(TestCase):
+
+    def setUp(self):
+        self.legacy_user = models.LunaUser.objects.create_user(
+            username='legacy@example.com')
+
+        self.migrated_legacy_user = models.LunaUser.objects.create_user(
+            username='+490123456789',
+            email='migrated.legacy@example.com', )
+
+    def tearDown(self):
+        self.legacy_user.delete()
+        self.migrated_legacy_user.delete()
+
+
+class LegacyTest(TestCaseWithLegacy):
+
+    def view(self):
+        return 'legacy'
+
+    def test_post_201(self):
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'email': self.legacy_user.username,
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data.get('username'), 'legacy@example.com')
+
+    def test_post_user_already_transferred(self):
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'email': self.migrated_legacy_user.email,
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.data, 'user_already_transferred')
+
+    def test_post_user_not_found(self):
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'email': 'non.legacy.email@example.com',
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, 'user_not_found')
+
+
+class VerificationTokenTest(TestCaseWithAuthenticatedUser):
+
+    def view(self):
+        return 'verification_token'
+
+    def test_post_anonymous(self):
+        """
+        This test is about posting to verification_token as an anonymous user.
+        """
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'phone_number': '15142321157',
+                'country_code': '49',
+                'token': '1234',
+            }),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 201, response.data)
+        # Get new database user
+        new_user = models.LunaUser.objects.exclude(id=self.user.id).get()
+        self.assertEqual(response.data['id'], new_user.id)
+        self.assertEqual(response.data['auth_token'], new_user.auth_token.key)
+        self.assertEqual(response.data['city'], '')
+        self.assertEqual(response.data['first_name'], '')
+        self.assertEqual(response.data['username'], '+4915142321157')
+
+    def test_post_existing(self):
+        """
+        This test is about posting to verification_token as an authenticated (legacy) user.
+        """
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'phone_number': '15142321157',
+                'country_code': '49',
+                'token': '1234',
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 201, response.data)
+        # Check existing database user
+        self.assertEqual(models.LunaUser.objects.count(), 1)
+        self.assertEqual(response.data['id'], self.user.id)
+        self.assertEqual(response.data['auth_token'], self.user.auth_token.key)
+        self.assertEqual(response.data['city'], self.user.city)
+        self.assertEqual(response.data['first_name'], self.user.first_name)
+        self.assertEqual(response.data['username'], '+4915142321157')
+
+    def test_post_400_phone_number_invalid(self):
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'phone_number': '123456789',
+                'country_code': '49',
+                'token': '1234',
+            }),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertEqual(response.data, 'phone_number_invalid')
+
+    def test_post_409(self):
+        """
+        This test is about posting to verification_token as an authenticated user while a different user with the
+        verified phone number exists.
+        """
+        # Create conflicting user
+        models.LunaUser.objects.create_user(
+            username='+4915142321157',
+            city='conflicting_city',
+            first_name='conflicting_first_name',
+            email='conflicting@example.com',
+            password='conflicting_password')
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'phone_number': '15142321157',
+                'country_code': '49',
+                'token': '1234',
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 409, response.data)
+        self.assertEqual(response.data, 'user_conflict')

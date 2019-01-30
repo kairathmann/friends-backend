@@ -122,10 +122,11 @@ class SelfResponses(APIView):
 
 
 class SelfQuestions(APIView):
-    permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        questions = models.SurveyQuestion.objects.all()
+        user = request.user
+        # Only include questions that haven't been answered by the user yet
+        questions = models.SurveyQuestion.objects.exclude(answers__responses__user=user)
         serializer = serializers.SurveyQuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -143,7 +144,6 @@ class Verification(APIView):
         via = request.data.get('via')
 
         # Check for None or ''
-
         if not phone_number:
             return Response('phone_number_missing', status=status.HTTP_400_BAD_REQUEST)
         if not country_code:
@@ -152,7 +152,6 @@ class Verification(APIView):
             return Response('via_missing', status=status.HTTP_400_BAD_REQUEST)
 
         # Validate
-
         if not country_code.startswith('+'):
             country_code = '+' + country_code
 
@@ -169,7 +168,6 @@ class Verification(APIView):
             return Response('via_invalid', status=status.HTTP_400_BAD_REQUEST)
 
         # Authy verification
-
         if not settings.AUTHY_DISABLE:
             verification = authy_api.phones.verification_start(
                 phone_number,
@@ -189,13 +187,19 @@ class Verification(APIView):
 class VerificationToken(APIView):
     permission_classes = (permissions.AllowAny,)
 
+    @transaction.atomic
     def post(self, request):
+        """
+        This function accepts both anonymous and authenticated users.
+        :param request:
+        :return:
+        """
+
         phone_number = request.data.get('phone_number')
         country_code = request.data.get('country_code')
         token = request.data.get('token')
 
         # Validate
-
         if not country_code.startswith('+'):
             country_code = '+' + country_code
 
@@ -209,7 +213,6 @@ class VerificationToken(APIView):
             return Response('phone_number_invalid', status=status.HTTP_400_BAD_REQUEST)
 
         # Authy verification
-
         if not settings.AUTHY_DISABLE:
             verification = authy_api.phones.verification_check(
                 phone_number,
@@ -219,9 +222,39 @@ class VerificationToken(APIView):
             if not verification.ok():
                 return Response('verification_failed', status=status.HTTP_400_BAD_REQUEST)
 
-        user, created = get_user_model().objects.get_or_create(
-            username=e164,
-        )
-        Token.objects.get_or_create(user=user)
+        if request.user.id is None:
+            user, created = get_user_model().objects.get_or_create(
+                username=e164,
+            )
+            Token.objects.get_or_create(user=user)
+        else:
+            if get_user_model().objects.filter(username=e164).exists():
+                return Response('user_conflict', status=status.HTTP_409_CONFLICT)
+            request.user.username = e164
+            request.user.save()
+            user = request.user
+
         serializer = serializers.LunaUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class Legacy(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        email = request.data.get('email')
+
+        # Success: user exists and has not been transferred
+        if models.LunaUser.objects.filter(username=email).exists():
+            user = models.LunaUser.objects.get(username=email)
+            Token.objects.get_or_create(user=user)
+            serializer = serializers.LunaUserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        # Conflict: user has already been transferred
+        elif models.LunaUser.objects.filter(email=email).exists():
+            return Response('user_already_transferred', status=status.HTTP_409_CONFLICT)
+
+        # User not found
+        else:
+            return Response('user_not_found', status=status.HTTP_404_NOT_FOUND)
