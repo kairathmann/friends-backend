@@ -479,7 +479,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'phone_number': '15142321157',
+                'phone_number': '8000000000',
                 'country_code': '49',
                 'token': '1234',
             }),
@@ -492,7 +492,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data['auth_token'], new_user.auth_token.key)
         self.assertEqual(response.data['city'], '')
         self.assertEqual(response.data['first_name'], '')
-        self.assertEqual(response.data['username'], '+4915142321157')
+        self.assertEqual(response.data['username'], '+498000000000')
 
     def test_post_existing(self):
         """
@@ -501,7 +501,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'phone_number': '15142321157',
+                'phone_number': '8000000000',
                 'country_code': '49',
                 'token': '1234',
             }),
@@ -515,7 +515,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data['auth_token'], self.user.auth_token.key)
         self.assertEqual(response.data['city'], self.user.city)
         self.assertEqual(response.data['first_name'], self.user.first_name)
-        self.assertEqual(response.data['username'], '+4915142321157')
+        self.assertEqual(response.data['username'], '+498000000000')
 
     def test_post_400_phone_number_invalid(self):
         response = self.client.post(
@@ -537,7 +537,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         """
         # Create conflicting user
         models.LunaUser.objects.create_user(
-            username='+4915142321157',
+            username='+498000000000',
             city='conflicting_city',
             first_name='conflicting_first_name',
             email='conflicting@example.com',
@@ -545,7 +545,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'phone_number': '15142321157',
+                'phone_number': '8000000000',
                 'country_code': '49',
                 'token': '1234',
             }),
