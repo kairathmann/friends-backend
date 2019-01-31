@@ -2,10 +2,7 @@ language: python
 python:
   - "3.6"
 script:
+  - source export_local.sh
   - python manage.py makemigrations
   - python manage.py migrate
   - python manage.py test
-env:
-  global:
-    - AUTHY_DISABLE=1
-    - AUTHY_ACCOUNT_SECURITY_API_KEY=dummy

@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'friends.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.environ.get('LUMINOS_DB_ENGINE'),
+        'NAME': os.environ.get('LUMINOS_DB_NAME'),
+        'USER': os.environ.get('LUMINOS_DB_USER'),
+        'PASSWORD': os.environ.get('LUMINOS_DB_PASSWORD'),
+        'HOST': os.environ.get('LUMINOS_DB_HOST'),
+        'PORT': os.environ.get('LUMINOS_DB_PORT'),
     }
 }
 
@@ -134,7 +138,7 @@ AUTH_USER_MODEL = 'friends.LunaUser'
 AUTHY_DISABLE = int(os.environ['AUTHY_DISABLE'])
 
 # Authy Application Key
-AUTHY_ACCOUNT_SECURITY_API_KEY = os.environ['AUTHY_ACCOUNT_SECURITY_API_KEY']
+AUTHY_ACCOUNT_SECURITY_API_KEY = os.environ.get('AUTHY_ACCOUNT_SECURITY_API_KEY')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

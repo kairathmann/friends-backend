@@ -1,5 +1,5 @@
 authy==2.2.3
-awsebcli==3.14.9
+awsebcli==3.14.10
 blessed==1.15.0
 botocore==1.12.81
 cached-property==1.5.1
@@ -18,8 +18,9 @@ docutils==0.14
 idna==2.7
 jmespath==0.9.3
 jsonschema==2.6.0
+mysqlclient==1.4.1
 pathspec==0.5.5
-phonenumbers==8.10.3
+phonenumbers==8.10.4
 python-dateutil==2.7.5
 pytz==2018.9
 PyYAML==3.13
