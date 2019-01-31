@@ -286,74 +286,90 @@ class TestCaseWithSurvey(TestCaseWithAuthenticatedUser):
 
     def tearDown(self):
         super(TestCaseWithSurvey, self).tearDown()
-        self.question1.delete()
-        self.question2.delete()
-        self.response2.delete()
+        models.SurveyQuestion.objects.all().delete()
+        models.SurveyAnswer.objects.all().delete()
+        models.SurveyResponse.objects.all().delete()
 
 
-class SelfResponsesTest(TestCaseWithSurvey):
+class ResponsesTest(TestCaseWithSurvey):
 
     def view(self):
-        return 'self_responses'
+        return 'responses'
 
     def test_post(self):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'answer_id': self.answer1a.id,
+                'answer_ids': [self.answer1a.id, self.answer2b.id],
             }),
             content_type='application/json',
             **self.header,
         )
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual(models.SurveyResponse.objects.count(), 2)
-        models.SurveyResponse.objects.all().delete()
+        self.assertEqual(models.SurveyResponse.objects.count(), 3)
+        self.assertIsInstance(response.data, list)
+        self.assertEqual(len(response.data), 2)
 
     def test_post_401(self):
         response = self.client.post(reverse_lazy(self.view()))
         self.assertGreaterEqual(response.status_code, 400)
 
-    def test_post_answer_id_missing(self):
+    def test_post_400_answer_ids_missing(self):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'answer_id': '',
             }),
             content_type='application/json',
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'answer_id_missing')
+        self.assertEqual(response.data, 'answer_ids_invalid')
+        self.assertEqual(models.SurveyResponse.objects.count(), 1)
 
-    def test_post_answer_id_invalid(self):
+    def test_post_400_answer_ids_invalid(self):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'answer_id': 'invalid id',
+                'answer_ids': ['invalid id'],
             }),
             content_type='application/json',
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'answer_id_invalid')
+        self.assertEqual(response.data, 'answer_ids_invalid')
+        self.assertEqual(models.SurveyResponse.objects.count(), 1)
 
-    def test_post_answer_id_unknown(self):
+    def test_post_400_second_answer_id_invalid(self):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'answer_id': -1,
+                'answer_ids': [self.answer1a.id, 'invalid id', self.answer2b.id],
             }),
             content_type='application/json',
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'answer_id_unknown')
+        self.assertEqual(response.data, 'answer_ids_invalid')
+        self.assertEqual(models.SurveyResponse.objects.count(), 1)
+
+    def test_post_400_answer_ids_unknown(self):
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'answer_ids': [-1],
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'answer_ids_unknown')
+        self.assertEqual(models.SurveyResponse.objects.count(), 1)
 
 
-class SelfQuestionsTest(TestCaseWithSurvey):
+class QuestionsTest(TestCaseWithSurvey):
 
     def view(self):
-        return 'self_questions'
+        return 'questions'
 
     def test_get(self):
         response = self.client.get(

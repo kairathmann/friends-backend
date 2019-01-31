@@ -2,6 +2,7 @@ from authy.api import AuthyApiClient
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.utils import IntegrityError
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -87,41 +88,39 @@ class Self(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class SelfResponses(APIView):
+class Responses(APIView):
 
-    @transaction.atomic
     def post(self, request):
-        json_body = request.data
-        answer_id = json_body.get('answer_id')
-
-        # Check for None or ''
-        if not answer_id:
-            return Response('answer_id_missing', status=status.HTTP_400_BAD_REQUEST)
+        answer_ids = request.data.get('answer_ids')
 
         # Validate
-        try:
-            answer_id_int = int(answer_id)
-        except:
-            return Response('answer_id_invalid', status=status.HTTP_400_BAD_REQUEST)
+        if not isinstance(answer_ids, list):
+            return Response('answer_ids_invalid', status=status.HTTP_400_BAD_REQUEST)
+
+        responses = []
 
         try:
-            answer = models.SurveyAnswer.objects.get(id=answer_id_int)
-        except:
-            return Response('answer_id_unknown', status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = models.SurveyResponse.objects.create(
-                user=request.user,
-                answer=answer,
-            )
-        except:
+            with transaction.atomic():
+                for answer_id in answer_ids:
+                    answer_id_int = int(answer_id)
+                    answer = models.SurveyAnswer.objects.get(id=answer_id_int)
+                    response = models.SurveyResponse.objects.create(
+                        user=request.user,
+                        answer=answer,
+                    )
+                    responses.append(response)
+        except ValueError:
+            return Response('answer_ids_invalid', status=status.HTTP_400_BAD_REQUEST)
+        except models.SurveyAnswer.DoesNotExist:
+            return Response('answer_ids_unknown', status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
             return Response('response_duplicate', status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = serializers.SurveyResponseSerializer(response)
+        serializer = serializers.SurveyResponseSerializer(responses, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class SelfQuestions(APIView):
+class Questions(APIView):
 
     def get(self, request):
         user = request.user
