@@ -1,0 +1,32 @@
+version: "3"
+services:
+  backend:
+    container_name: friends-backend
+    build: .
+    env_file:
+      - config.env
+    environment:
+      - PYTHONUNBUFFERED=0
+    ports:
+      - 8000:8000
+    volumes:
+      - ./friends:/srv/friends
+      - ./manage.py:/srv/manage.py
+      - ./run_django_docker.sh:/srv/run_django_docker.sh
+    command: ./srv/run_django_docker.sh
+    depends_on:
+      - database
+    links:
+      - database:database
+  database:
+    image: mysql:5.6.43
+    container_name: database
+    environment:
+      MYSQL_ROOT_PASSWORD: luminos_db_docker_root_password
+      MYSQL_DATABASE: luminos
+      MYSQL_USER: masteruser
+      MYSQL_PASSWORD: pass_luminos_db_docker
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database/mysql:/var/lib/mysql

@@ -15,3 +15,10 @@ Thumbs.db
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Docker-Compose env files
+config.local.env
+config.env
+
+# Docker-Compose mysql container data volume
+database/
