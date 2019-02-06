@@ -19,6 +19,8 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/chat/<int:id>', views.Chat.as_view(), name='chat'),
+    path('api/v1/chats/', views.Chats.as_view(), name='chats'),
     path('api/v1/rounds/', views.Rounds.as_view(), name='rounds'),
     path('api/v1/rounds/subscribe/', views.RoundsSubscribe.as_view(), name='rounds_subscribe'),
     path('api/v1/questions/', views.Questions.as_view(), name='questions'),

@@ -5,9 +5,56 @@ from . import models
 import json
 
 
-class TestCaseWithAuthenticatedUser(TestCase):
+class TestCaseWithData(TestCase):
+    def tearDown(self):
+        models.Chat.objects.all().delete()
+        models.Round.objects.all().delete()
+        models.LunaUser.objects.all().delete()
+        models.SurveyQuestion.objects.all().delete()
+        models.SurveyAnswer.objects.all().delete()
+        models.SurveyResponse.objects.all().delete()
 
-    def setUp(self):
+    def addRounds(self):
+        self.round1 = models.Round.objects.create(
+            description='description1',
+        )
+        self.round2 = models.Round.objects.create(
+            description='description2',
+        )
+
+    def addSurvey(self):
+        self.question1 = models.SurveyQuestion.objects.create(
+            text='text1',
+        )
+        self.answer1a = models.SurveyAnswer.objects.create(
+            question=self.question1,
+            text='text1a',
+            order_index=1,
+        )
+        self.answer1b = models.SurveyAnswer.objects.create(
+            question=self.question1,
+            text='text1b',
+            order_index=0,
+        )
+        self.question2 = models.SurveyQuestion.objects.create(
+            text='text2',
+        )
+        self.answer2a = models.SurveyAnswer.objects.create(
+            question=self.question2,
+            text='text2a',
+            order_index=1,
+        )
+        self.answer2b = models.SurveyAnswer.objects.create(
+            question=self.question2,
+            text='text2b',
+            order_index=0,
+        )
+        self.response2 = models.SurveyResponse.objects.create(
+            user=self.user,
+            answer=self.answer2a,
+        )
+
+    def addAuthenticatedUser(self):
         self.user = models.LunaUser.objects.create_user(
             username='test',
             city='test-city',
@@ -17,27 +64,44 @@ class TestCaseWithAuthenticatedUser(TestCase):
         self.token = Token.objects.get(user=self.user).key
         self.header = {'HTTP_AUTHORIZATION': "Bearer {}".format(self.token)}
 
-    def tearDown(self):
-        models.LunaUser.objects.all().delete()
+    def addMoreUsers(self):
+        self.user2 = models.LunaUser.objects.create_user(
+            username='test2',
+            city='test-city',
+            first_name='Second',
+            email='test2@example.com',
+            password='test')
+
+        self.user3 = models.LunaUser.objects.create_user(
+            username='test3',
+            city='test-city',
+            first_name='Third',
+            email='test3@example.com',
+            password='test')
+
+    def addChat(self, users):
+        self.chat1 = models.Chat.objects.create(
+            round = None,
+            initial_type = models.CHAT_TYPE_TEXT,
+            type = models.CHAT_TYPE_TEXT
+        )
+
+        #We need the DB to assign a chat ID before we can use it in Many-to-Many relations.
+        self.chat1.save()
+        for u in users:
+            self.chat1.users.add(u)
 
 
-class TestCaseWithRounds(TestCaseWithAuthenticatedUser):
+class TestCaseWithAuthenticatedUser(TestCaseWithData):
 
     def setUp(self):
-        super(TestCaseWithRounds, self).setUp()
-        self.round1 = models.Round.objects.create(
-            description='description1',
-        )
-        self.round2 = models.Round.objects.create(
-            description='description2',
-        )
-
-    def tearDown(self):
-        super(TestCaseWithRounds, self).tearDown()
-        models.Round.objects.all().delete()
+        self.addAuthenticatedUser()
 
 
-class RoundsTest(TestCaseWithRounds):
+class RoundsTest(TestCaseWithAuthenticatedUser):
+    def setUp(self):
+        super(RoundsTest, self).setUp()
+        self.addRounds()
 
     def view(self):
         return 'rounds'
@@ -59,7 +123,6 @@ class RoundsTest(TestCaseWithRounds):
                 x['description'] == self.round2.description and
                 not x['is_subscribed']
         )])
-
 
     def test_get_1_subscribed(self):
         self.round1.users.add(self.user)
@@ -87,7 +150,10 @@ class RoundsTest(TestCaseWithRounds):
         self.assertEqual(response.status_code, 401)
 
 
-class RoundsSubscribeTest(TestCaseWithRounds):
+class RoundsSubscribeTest(TestCaseWithAuthenticatedUser):
+    def setUp(self):
+        super(RoundsSubscribeTest, self).setUp()
+        self.addRounds()
 
     def view(self):
         return 'rounds_subscribe'
@@ -249,49 +315,10 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.status_code, 401)
 
 
-class TestCaseWithSurvey(TestCaseWithAuthenticatedUser):
-
+class ResponsesTest(TestCaseWithAuthenticatedUser):
     def setUp(self):
-        super(TestCaseWithSurvey, self).setUp()
-        self.question1 = models.SurveyQuestion.objects.create(
-            text='text1',
-        )
-        self.answer1a = models.SurveyAnswer.objects.create(
-            question=self.question1,
-            text='text1a',
-            order_index=1,
-        )
-        self.answer1b = models.SurveyAnswer.objects.create(
-            question=self.question1,
-            text='text1b',
-            order_index=0,
-        )
-        self.question2 = models.SurveyQuestion.objects.create(
-            text='text2',
-        )
-        self.answer2a = models.SurveyAnswer.objects.create(
-            question=self.question2,
-            text='text2a',
-            order_index=1,
-        )
-        self.answer2b = models.SurveyAnswer.objects.create(
-            question=self.question2,
-            text='text2b',
-            order_index=0,
-        )
-        self.response2 = models.SurveyResponse.objects.create(
-            user=self.user,
-            answer=self.answer2a,
-        )
-
-    def tearDown(self):
-        super(TestCaseWithSurvey, self).tearDown()
-        models.SurveyQuestion.objects.all().delete()
-        models.SurveyAnswer.objects.all().delete()
-        models.SurveyResponse.objects.all().delete()
-
-
-class ResponsesTest(TestCaseWithSurvey):
+        super(ResponsesTest, self).setUp()
+        self.addSurvey()
 
     def view(self):
         return 'responses'
@@ -366,7 +393,10 @@ class ResponsesTest(TestCaseWithSurvey):
         self.assertEqual(models.SurveyResponse.objects.count(), 1)
 
 
-class QuestionsTest(TestCaseWithSurvey):
+class QuestionsTest(TestCaseWithAuthenticatedUser):
+    def setUp(self):
+        super(QuestionsTest, self).setUp()
+        self.addSurvey()
 
     def view(self):
         return 'questions'
@@ -554,3 +584,66 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 409, response.data)
         self.assertEqual(response.data, 'user_conflict')
+
+
+class ChatsTest(TestCaseWithAuthenticatedUser):
+    def setUp(self):
+        super(ChatsTest, self).setUp()
+        self.addMoreUsers()
+
+    def view(self):
+        return 'chats'
+
+    def test_get_chats_has_one_chat(self):
+        self.addChat([self.user, self.user2])
+
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(1, len(response.data))
+        self.assertEqual(2, len(response.data[0]['users']))
+        self.assertEqual('Test Name', response.data[0]['users'][0]['first_name'])
+        self.assertEqual('Second', response.data[0]['users'][1]['first_name'])
+
+    def test_get_chats_has_many_chats_for_popular_users(self):
+        self.addChat([self.user, self.user2])
+        self.addChat([self.user, self.user3]) #SO POPULAR!
+
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(2, len(response.data))
+
+    def test_no_chats_get_gets_empty_array(self):
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(0, len(response.data))
+
+    def test_while_others_chat_you_dont_see_them(self):
+        self.addChat([self.user2, self.user3])
+
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(0, len(response.data))

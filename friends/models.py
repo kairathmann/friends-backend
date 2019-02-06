@@ -158,3 +158,31 @@ class Round(models.Model):
 
     class Meta:
         ordering = ['start_timestamp', ]
+
+CHAT_TYPE_FREE = 1
+CHAT_TYPE_TEXT = 2
+CHAT_TYPE_LONGTEXT = 3
+CHAT_TYPE_VIDEO = 4
+
+CHAT_TYPES = (
+	(CHAT_TYPE_FREE, "Free"),
+	(CHAT_TYPE_TEXT, "Text"),
+	(CHAT_TYPE_LONGTEXT, "Longtext"),
+	(CHAT_TYPE_VIDEO, "Video"),
+)
+
+class Chat(models.Model):
+    """
+    A chat!
+    """
+
+    round = models.ForeignKey(Round, null=True, on_delete=models.DO_NOTHING)
+
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='chats')
+
+    # The type that was initially set for this chat during a Round, if applicable.
+    # Only used for data analysis.
+    initial_type = models.PositiveSmallIntegerField(choices=CHAT_TYPES)
+
+    # The current type of this chat. Returned by the API.
+    type = models.PositiveSmallIntegerField(choices=CHAT_TYPES)

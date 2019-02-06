@@ -3,6 +3,18 @@ from . import models
 
 
 class LunaUserSerializer(serializers.ModelSerializer):
+    '''
+    Serialize data about a LunaUser, including the auth token and other private details
+    '''
+
+    emoji = serializers.SerializerMethodField('get_mock_emoji')
+    def get_mock_emoji(self, user):
+        return '😬' #in pycharm you don't see what's in here!
+
+    color = serializers.SerializerMethodField('get_mock_color')
+    def get_mock_color(self, user):
+        return "{id: 1, hex_value='ca2c92'}"
+
     class Meta:
         model = models.LunaUser
         fields = [
@@ -11,6 +23,32 @@ class LunaUserSerializer(serializers.ModelSerializer):
             'city',
             'first_name',
             'username',
+            'color',
+            'emoji'
+        ]
+
+
+class LunaUserPartnerSerializer(serializers.ModelSerializer):
+    '''
+    Serialize data about a LunaUser, hiding the auth token and other private details
+    '''
+
+    emoji = serializers.SerializerMethodField('get_mock_emoji')
+    def get_mock_emoji(self, user):
+        return '😬' #in pycharm you don't see what's in here!
+
+    color = serializers.SerializerMethodField('get_mock_color')
+    def get_mock_color(self, user):
+        return "{id: 1, hex_value='ca2c92'}"
+
+    class Meta:
+        model = models.LunaUser
+        fields = [
+            'id',
+            'city',
+            'first_name',
+            'color',
+            'emoji'
         ]
 
 
@@ -65,3 +103,20 @@ class RoundSerializer(serializers.ModelSerializer):
         :return: The contents of the custom field 'is_subscribed'.
         """
         return obj.users.filter(id=self.context.get('request').user.id).exists()
+
+class ChatSerializer(serializers.ModelSerializer):
+    users = LunaUserPartnerSerializer(many=True)
+
+    unread = serializers.SerializerMethodField('get_mock_unread')
+    def get_mock_unread(self, chat):
+        return 1
+
+    class Meta:
+        model = models.Chat
+        fields = [
+            'id',
+            'round',
+            'users',
+            'type',
+            'unread',
+        ]

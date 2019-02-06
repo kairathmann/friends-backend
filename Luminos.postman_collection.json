@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e30edd25-305b-4211-8d1d-86c82add498e",
+		"_postman_id": "c1535e3a-ffd3-4daa-a5bf-93d7cb312638",
 		"name": "Luminos",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -234,6 +234,30 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "/api/v1/chats/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/chats/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"chats",
+						""
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -245,27 +269,5 @@
 				"type": "string"
 			}
 		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"id": "44dad883-f477-4ac9-9898-80dc60172235",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"id": "13c44ce1-dfbc-4317-96a0-b5e4f8b2e419",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	]
+	}
 }
