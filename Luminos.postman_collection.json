@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c1535e3a-ffd3-4daa-a5bf-93d7cb312638",
+		"_postman_id": "bfe43109-3629-4953-a710-33adda9a804c",
 		"name": "Luminos",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -121,13 +121,12 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"type": "text",
 						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"city\": \"foo\",\n\t\"first_name\": \"bar\"\n}"
+					"raw": "{\n\t\"city\": \"foo\",\n\t\"first_name\": \"bar\",\n\t\"color\": 1\n}"
 				},
 				"url": {
 					"raw": "{{HOST}}/api/v1/self/",
@@ -253,6 +252,27 @@
 						"api",
 						"v1",
 						"chats",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/colors/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{HOST}}/api/v1/colors/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"colors",
 						""
 					]
 				}

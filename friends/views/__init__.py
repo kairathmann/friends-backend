@@ -8,10 +8,12 @@ from .rounds_subscribe import RoundsSubscribe
 from .self import Self
 from .verification import Verification
 from .verification_token import VerificationToken
+from .colors import Colors
 
 __all__ = [
     Chat,
     Chats,
+    Colors,
     Legacy,
     Questions,
     Responses,

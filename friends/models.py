@@ -31,6 +31,15 @@ GENDER_IDS = (
     (GENDER_ID_OTHER, 'other'),
 )
 
+COLOR_MAX_LENGTH = 6
+
+class Color(models.Model):
+    """
+    A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
+    Colors are limited to 8 choices.
+    """
+    hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
+
 
 class LunaUser(AbstractUser):
     """
@@ -38,6 +47,7 @@ class LunaUser(AbstractUser):
     """
 
     city = models.CharField(max_length=CITY_MAX_LENGTH, db_index=True)
+    color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
 
 
 class LegacyDataSet(models.Model):

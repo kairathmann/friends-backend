@@ -6,6 +6,12 @@ import json
 
 
 class TestCaseWithData(TestCase):
+    def setUp(self):
+        # Remove colors that are inserted by default (8 basic ones)
+        models.Color.objects.all().delete()
+        models.Color.objects.create(id=1, hex_value='AABBCC')
+        models.Color.objects.create(id=2, hex_value='ABABAB')
+
     def tearDown(self):
         models.Chat.objects.all().delete()
         models.Round.objects.all().delete()
@@ -13,6 +19,7 @@ class TestCaseWithData(TestCase):
         models.SurveyQuestion.objects.all().delete()
         models.SurveyAnswer.objects.all().delete()
         models.SurveyResponse.objects.all().delete()
+        models.Color.objects.all().delete()
 
     def addRounds(self):
         self.round1 = models.Round.objects.create(
@@ -60,6 +67,7 @@ class TestCaseWithData(TestCase):
             city='test-city',
             first_name='Test Name',
             email='test@example.com',
+            color=models.Color.objects.get(id=1),
             password='test')
         self.token = Token.objects.get(user=self.user).key
         self.header = {'HTTP_AUTHORIZATION': "Bearer {}".format(self.token)}
@@ -70,6 +78,7 @@ class TestCaseWithData(TestCase):
             city='test-city',
             first_name='Second',
             email='test2@example.com',
+            color=models.Color.objects.get(id=2),
             password='test')
 
         self.user3 = models.LunaUser.objects.create_user(
@@ -77,6 +86,7 @@ class TestCaseWithData(TestCase):
             city='test-city',
             first_name='Third',
             email='test3@example.com',
+            color=models.Color.objects.get(id=2),
             password='test')
 
     def addChat(self, users):
@@ -92,9 +102,11 @@ class TestCaseWithData(TestCase):
             self.chat1.users.add(u)
 
 
+
 class TestCaseWithAuthenticatedUser(TestCaseWithData):
 
     def setUp(self):
+        super(TestCaseWithAuthenticatedUser, self).setUp()
         self.addAuthenticatedUser()
 
 
@@ -259,6 +271,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             json.dumps({
                 'city': 'mycity',
                 'first_name': 'myfirstname',
+                'color': 2
             }),
             content_type='application/json',
             **self.header,
@@ -266,6 +279,8 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get('city'), 'mycity')
         self.assertEqual(response.data.get('first_name'), 'myfirstname')
+        self.assertEqual(response.data.get('color').get('id'), 2)
+        self.assertEqual(response.data.get('color').get('hex_value'), 'ABABAB')
 
     def test_put_401(self):
         response = self.client.put(
@@ -278,6 +293,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             reverse_lazy(self.view()),
             json.dumps({
                 'first_name': 'myfirstname',
+                'color': 2
             }),
             content_type='application/json',
             **self.header,
@@ -290,12 +306,40 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             reverse_lazy(self.view()),
             json.dumps({
                 'city': 'mycity',
+                'color': 2
             }),
             content_type='application/json',
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'first_name_missing')
+
+    def test_put_color_missing(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'city': 'mycity',
+                'first_name': 'myfirstname'
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'color_missing')
+
+    def test_put_color_invalid_id(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'city': 'mycity',
+                'first_name': 'myfirstname',
+                'color': 10
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'color_invalid_id')
 
     def test_get(self):
         response = self.client.get(
@@ -307,6 +351,8 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data.get('username'), 'test')
         self.assertEqual(response.data.get('city'), 'test-city')
         self.assertEqual(response.data.get('first_name'), 'Test Name')
+        self.assertEqual(response.data.get('color').get('id'), 1)
+        self.assertEqual(response.data.get('color').get('hex_value'), 'AABBCC')
 
     def test_get_401(self):
         response = self.client.get(
@@ -609,6 +655,10 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(2, len(response.data[0]['users']))
         self.assertEqual('Test Name', response.data[0]['users'][0]['first_name'])
         self.assertEqual('Second', response.data[0]['users'][1]['first_name'])
+        self.assertEqual('AABBCC', response.data[0]['users'][0]['color']['hex_value'])
+        self.assertEqual(1, response.data[0]['users'][0]['color']['id'])
+        self.assertEqual('ABABAB', response.data[0]['users'][1]['color']['hex_value'])
+        self.assertEqual(2, response.data[0]['users'][1]['color']['id'])
 
     def test_get_chats_has_many_chats_for_popular_users(self):
         self.addChat([self.user, self.user2])
@@ -647,3 +697,33 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(0, len(response.data))
+
+
+class ColorsTest(TestCaseWithAuthenticatedUser):
+
+    def view(self):
+        return 'colors'
+
+    def test_get(self):
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([
+            {
+                'id': 1,
+                'hex_value': 'AABBCC'
+            },
+            {
+                'id': 2,
+                'hex_value': 'ABABAB'
+            }
+        ], response.data)
+
+    def test_get_401(self):
+        response = self.client.get(
+            reverse_lazy(self.view())
+        )
+        self.assertEqual(response.status_code, 401)

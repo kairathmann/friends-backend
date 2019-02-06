@@ -1,6 +1,14 @@
 from rest_framework import serializers
 from . import models
 
+class ColorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Color
+        fields = [
+            'id',
+            'hex_value',
+        ]
 
 class LunaUserSerializer(serializers.ModelSerializer):
     '''
@@ -11,9 +19,7 @@ class LunaUserSerializer(serializers.ModelSerializer):
     def get_mock_emoji(self, user):
         return '😬' #in pycharm you don't see what's in here!
 
-    color = serializers.SerializerMethodField('get_mock_color')
-    def get_mock_color(self, user):
-        return "{id: 1, hex_value='ca2c92'}"
+    color = ColorSerializer()
 
     class Meta:
         model = models.LunaUser
@@ -37,9 +43,7 @@ class LunaUserPartnerSerializer(serializers.ModelSerializer):
     def get_mock_emoji(self, user):
         return '😬' #in pycharm you don't see what's in here!
 
-    color = serializers.SerializerMethodField('get_mock_color')
-    def get_mock_color(self, user):
-        return "{id: 1, hex_value='ca2c92'}"
+    color = ColorSerializer()
 
     class Meta:
         model = models.LunaUser

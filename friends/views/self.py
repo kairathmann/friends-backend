@@ -16,12 +16,22 @@ class Self(APIView):
     def put(self, request):
         city = request.data.get('city')
         first_name = request.data.get('first_name')
+        color = request.data.get('color')
 
         # Check for None or ''
         if not city:
             return Response('city_missing', status=status.HTTP_400_BAD_REQUEST)
         if not first_name:
             return Response('first_name_missing', status=status.HTTP_400_BAD_REQUEST)
+        if not color:
+            return Response('color_missing', status=status.HTTP_400_BAD_REQUEST)
+
+        color_instance = None
+        try:
+            # Get color instance from database
+            color_instance = models.Color.objects.get(id=color)
+        except models.Color.DoesNotExist:
+            return Response('color_invalid_id', status=status.HTTP_400_BAD_REQUEST)
 
         # Clean
         clean_city = city[:models.CITY_MAX_LENGTH]
@@ -30,6 +40,7 @@ class Self(APIView):
         # Update
         request.user.city = clean_city
         request.user.first_name = clean_first_name
+        request.user.color = color_instance
         request.user.save()
 
         serializer = serializers.LunaUserSerializer(request.user)
