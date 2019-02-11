@@ -19,14 +19,15 @@ services:
     links:
       - database:database
   database:
-    image: mysql:5.6.43
+    image: mdillon/postgis:10-alpine
     container_name: database
-    environment:
-      MYSQL_ROOT_PASSWORD: luminos_db_docker_root_password
-      MYSQL_DATABASE: luminos
-      MYSQL_USER: masteruser
-      MYSQL_PASSWORD: pass_luminos_db_docker
     ports:
-      - 3306:3306
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=luminos
+      - POSTGRES_USER=masteruser
+      - POSTGRES_PASSWORD=pass_luminos_db_docker
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
     volumes:
-      - ./database/mysql:/var/lib/mysql
+      - ./database/postgres:/var/lib/postgresql/data:z
