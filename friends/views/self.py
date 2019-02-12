@@ -12,11 +12,11 @@ class Self(APIView):
         serializer = serializers.LunaUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @transaction.atomic
     def put(self, request):
         city = request.data.get('city')
         first_name = request.data.get('first_name')
         color = request.data.get('color')
+        emoji = request.data.get('emoji')
 
         # Check for None or ''
         if not city:
@@ -25,6 +25,8 @@ class Self(APIView):
             return Response('first_name_missing', status=status.HTTP_400_BAD_REQUEST)
         if not color:
             return Response('color_missing', status=status.HTTP_400_BAD_REQUEST)
+        if not emoji:
+            return Response('emoji_missing', status=status.HTTP_400_BAD_REQUEST)
 
         color_instance = None
         try:
@@ -36,12 +38,15 @@ class Self(APIView):
         # Clean
         clean_city = city[:models.CITY_MAX_LENGTH]
         clean_first_name = first_name[:models.FIRST_NAME_MAX_LENGTH]
+        emoji_clean = emoji[:models.EMOJI_MAX_LENGTH]
 
         # Update
-        request.user.city = clean_city
-        request.user.first_name = clean_first_name
-        request.user.color = color_instance
-        request.user.save()
+        with transaction.atomic():
+            request.user.city = clean_city
+            request.user.first_name = clean_first_name
+            request.user.color = color_instance
+            request.user.emoji = emoji_clean
+            request.user.save()
 
         serializer = serializers.LunaUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)

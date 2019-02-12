@@ -32,6 +32,7 @@ GENDER_IDS = (
 )
 
 COLOR_MAX_LENGTH = 6
+EMOJI_MAX_LENGTH = 4
 
 class Color(models.Model):
     """
@@ -48,6 +49,7 @@ class LunaUser(AbstractUser):
 
     city = models.CharField(max_length=CITY_MAX_LENGTH, db_index=True)
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
+    emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
 
 
 class LegacyDataSet(models.Model):

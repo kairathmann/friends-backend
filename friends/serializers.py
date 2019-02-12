@@ -15,10 +15,6 @@ class LunaUserSerializer(serializers.ModelSerializer):
     Serialize data about a LunaUser, including the auth token and other private details
     '''
 
-    emoji = serializers.SerializerMethodField('get_mock_emoji')
-    def get_mock_emoji(self, user):
-        return '😬' #in pycharm you don't see what's in here!
-
     color = ColorSerializer()
 
     class Meta:
@@ -38,10 +34,6 @@ class LunaUserPartnerSerializer(serializers.ModelSerializer):
     '''
     Serialize data about a LunaUser, hiding the auth token and other private details
     '''
-
-    emoji = serializers.SerializerMethodField('get_mock_emoji')
-    def get_mock_emoji(self, user):
-        return '😬' #in pycharm you don't see what's in here!
 
     color = ColorSerializer()
 

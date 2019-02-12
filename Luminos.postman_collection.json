@@ -146,12 +146,13 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json"
+						"value": "application/json",
+						"disabled": false
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"city\": \"foo\",\n\t\"first_name\": \"bar\",\n\t\"color\": 1\n}"
+					"raw": "{\n\t\"city\": \"Łaziska\",\n\t\"first_name\": \"bar\",\n\t\"color\": 1,\n\t\"emoji\": \"🙈\"\n}"
 				},
 				"url": {
 					"raw": "{{HOST}}/api/v1/self/",
@@ -288,7 +289,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{HOST}}/api/v1/colors/",
 					"host": [
