@@ -30,6 +30,31 @@
 			"response": []
 		},
 		{
+			"name": "/api/v1/questions/answered",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/questions/answered",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"questions",
+						"answered",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/api/v1/responses/",
 			"request": {
 				"method": "POST",

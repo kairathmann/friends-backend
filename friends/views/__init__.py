@@ -9,6 +9,7 @@ from .self import Self
 from .verification import Verification
 from .verification_token import VerificationToken
 from .colors import Colors
+from .questions_answered import QuestionsAnswered
 
 __all__ = [
     Chat,
@@ -16,6 +17,7 @@ __all__ = [
     Colors,
     Legacy,
     Questions,
+    QuestionsAnswered,
     Responses,
     Rounds,
     RoundsSubscribe,

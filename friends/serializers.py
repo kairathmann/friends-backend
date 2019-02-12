@@ -64,7 +64,6 @@ class SurveyAnswerSerializer(serializers.ModelSerializer):
             'text',
         ]
 
-
 class SurveyQuestionSerializer(serializers.ModelSerializer):
     answers = SurveyAnswerSerializer(many=True)
 
@@ -76,6 +75,24 @@ class SurveyQuestionSerializer(serializers.ModelSerializer):
             'answers',
         ]
 
+class SurveyAnsweredQuestionSerializer(serializers.ModelSerializer):
+    answers = SurveyAnswerSerializer(many=True)
+    last_answer = serializers.SerializerMethodField('get_last_answer_id')
+
+    class Meta:
+        model = models.SurveyQuestion
+        fields = [
+            'id',
+            'answers',
+            'text',
+            'last_answer'
+        ]
+
+    def get_last_answer_id(self, obj):
+        response = models.SurveyResponse.objects\
+            .filter(answer__question=obj, user_id=self.context.get('request').user.id)\
+            .latest('timestamp')
+        return response.answer_id
 
 class SurveyResponseSerializer(serializers.ModelSerializer):
     class Meta:

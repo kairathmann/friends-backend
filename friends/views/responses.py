@@ -37,4 +37,3 @@ class Responses(APIView):
 
         serializer = serializers.SurveyResponseSerializer(responses, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-

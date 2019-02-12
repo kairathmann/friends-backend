@@ -61,6 +61,12 @@ class TestCaseWithData(TestCase):
             answer=self.answer2a,
         )
 
+        # Response 2b is current response now as is created a few ms after response2
+        self.response2b = models.SurveyResponse.objects.create(
+            user=self.user,
+            answer=self.answer2b,
+        )
+
     def addAuthenticatedUser(self):
         self.user = models.LunaUser.objects.create_user(
             username='test',
@@ -379,7 +385,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual(models.SurveyResponse.objects.count(), 3)
+        self.assertEqual(models.SurveyResponse.objects.count(), 4)
         self.assertIsInstance(response.data, list)
         self.assertEqual(len(response.data), 2)
 
@@ -397,7 +403,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'answer_ids_invalid')
-        self.assertEqual(models.SurveyResponse.objects.count(), 1)
+        self.assertEqual(models.SurveyResponse.objects.count(), 2)
 
     def test_post_400_answer_ids_invalid(self):
         response = self.client.post(
@@ -410,7 +416,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'answer_ids_invalid')
-        self.assertEqual(models.SurveyResponse.objects.count(), 1)
+        self.assertEqual(models.SurveyResponse.objects.count(), 2)
 
     def test_post_400_second_answer_id_invalid(self):
         response = self.client.post(
@@ -423,7 +429,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'answer_ids_invalid')
-        self.assertEqual(models.SurveyResponse.objects.count(), 1)
+        self.assertEqual(models.SurveyResponse.objects.count(), 2)
 
     def test_post_400_answer_ids_unknown(self):
         response = self.client.post(
@@ -436,7 +442,39 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'answer_ids_unknown')
-        self.assertEqual(models.SurveyResponse.objects.count(), 1)
+        self.assertEqual(models.SurveyResponse.objects.count(), 2)
+
+class QuestionsAnsweredTest(TestCaseWithAuthenticatedUser):
+    def setUp(self):
+        super(QuestionsAnsweredTest, self).setUp()
+        self.addSurvey()
+
+    def view(self):
+        return 'questions_answered'
+
+    def test_get(self):
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn({
+            'id': self.question2.id,
+            'text': self.question2.text,
+            'last_answer': self.response2b.answer.id,
+            'answers': [
+                {
+                    'id': self.answer2b.id,
+                    'text': self.answer2b.text,
+                },
+                {
+                    'id': self.answer2a.id,
+                    'text': self.answer2a.text,
+                }
+            ]
+        }, response.data)
+
 
 
 class QuestionsTest(TestCaseWithAuthenticatedUser):
@@ -451,7 +489,7 @@ class QuestionsTest(TestCaseWithAuthenticatedUser):
         response = self.client.get(
             reverse_lazy(self.view()),
             content_type='application/json',
-            **self.header,
+            **self.header
         )
 
         self.assertEqual(response.status_code, 200)
