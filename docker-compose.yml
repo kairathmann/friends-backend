@@ -13,7 +13,14 @@ services:
       - ./friends:/srv/friends
       - ./manage.py:/srv/manage.py
       - ./run_django_docker.sh:/srv/run_django_docker.sh
-    command: ./srv/run_django_docker.sh
+      - ./wait-for-it.sh:/srv/wait-for-it.sh
+    command:
+      [
+        "./srv/wait-for-it.sh",
+        "database:5432",
+        "--",
+        "./srv/run_django_docker.sh",
+      ]
     depends_on:
       - database
     links:
