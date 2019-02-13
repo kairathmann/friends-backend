@@ -1,14 +1,15 @@
 from rest_framework import serializers
 from . import models
 
-class ColorSerializer(serializers.ModelSerializer):
 
+class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Color
         fields = [
             'id',
             'hex_value',
         ]
+
 
 class LunaUserSerializer(serializers.ModelSerializer):
     '''
@@ -56,6 +57,7 @@ class SurveyAnswerSerializer(serializers.ModelSerializer):
             'text',
         ]
 
+
 class SurveyQuestionSerializer(serializers.ModelSerializer):
     answers = SurveyAnswerSerializer(many=True)
 
@@ -66,6 +68,7 @@ class SurveyQuestionSerializer(serializers.ModelSerializer):
             'text',
             'answers',
         ]
+
 
 class SurveyAnsweredQuestionSerializer(serializers.ModelSerializer):
     answers = SurveyAnswerSerializer(many=True)
@@ -81,10 +84,11 @@ class SurveyAnsweredQuestionSerializer(serializers.ModelSerializer):
         ]
 
     def get_last_answer_id(self, obj):
-        response = models.SurveyResponse.objects\
-            .filter(answer__question=obj, user_id=self.context.get('request').user.id)\
+        response = models.SurveyResponse.objects \
+            .filter(answer__question=obj, user_id=self.context.get('request').user.id) \
             .latest('timestamp')
         return response.answer_id
+
 
 class SurveyResponseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -117,19 +121,52 @@ class RoundSerializer(serializers.ModelSerializer):
         """
         return obj.users.filter(id=self.context.get('request').user.id).exists()
 
-class ChatSerializer(serializers.ModelSerializer):
-    users = LunaUserPartnerSerializer(many=True)
 
-    unread = serializers.SerializerMethodField('get_mock_unread')
-    def get_mock_unread(self, chat):
-        return 1
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Message
+        fields = [
+            'id',
+            'sender',
+            'timestamp',
+            'text'
+        ]
+
+
+class ChatUsersSerializer(serializers.ModelSerializer):
+    user = LunaUserPartnerSerializer()
+
+    class Meta:
+        model = models.ChatUsers
+        fields = [
+            'user',
+            'last_read',
+        ]
+
+
+class ChatDetailSerializer(serializers.ModelSerializer):
+    messages = MessageSerializer(many=True)
+    chatusers_set = ChatUsersSerializer(many=True)
 
     class Meta:
         model = models.Chat
         fields = [
             'id',
             'round',
-            'users',
             'type',
-            'unread',
+            'chatusers_set',
+            'messages'
+        ]
+
+
+class ChatOverviewSerializer(serializers.ModelSerializer):
+    chatusers_set = ChatUsersSerializer(many=True)
+
+    class Meta:
+        model = models.Chat
+        fields = [
+            'id',
+            'round',
+            'type',
+            'chatusers_set',
         ]

@@ -10,6 +10,6 @@ class Chats(APIView):
     def get(self, request):
         user = request.user
 
-        chats = models.Chat.objects.filter(users__in=[user])
-        serializer = serializers.ChatSerializer(chats, many=True)
+        chats = models.Chat.objects.filter(chatusers__user=user)
+        serializer = serializers.ChatOverviewSerializer(chats, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

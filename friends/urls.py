@@ -19,7 +19,7 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/chat/<int:id>', views.Chat.as_view(), name='chat'),
+    path('api/v1/chats/<id>/', views.ChatsId.as_view(), name='chat'),
     path('api/v1/chats/', views.Chats.as_view(), name='chats'),
     path('api/v1/colors/', views.Colors.as_view(), name='colors'),
     path('api/v1/rounds/', views.Rounds.as_view(), name='rounds'),

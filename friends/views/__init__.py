@@ -1,5 +1,5 @@
 from .chats import Chats
-from .chat import Chat
+from .chats_id import ChatsId
 from .legacy import Legacy
 from .questions import Questions
 from .responses import Responses
@@ -12,7 +12,7 @@ from .colors import Colors
 from .questions_answered import QuestionsAnswered
 
 __all__ = [
-    Chat,
+    ChatsId,
     Chats,
     Colors,
     Legacy,
