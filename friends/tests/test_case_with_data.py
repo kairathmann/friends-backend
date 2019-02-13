@@ -65,6 +65,12 @@ class TestCaseWithData(TestCase):
             answer=self.answer2b,
         )
 
+    def addMultiResponseQuestion(self):
+        self.multi_response_question1 = models.SurveyQuestion.objects.create(
+            text='multi response question text',
+            max_answers=2,
+        )
+
     def addAuthenticatedUser(self):
         self.user = models.LunaUser.objects.create_user(
             username='test',
