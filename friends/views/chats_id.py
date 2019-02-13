@@ -12,10 +12,7 @@ class ChatsId(APIView):
     def get(self, request, **kwargs):
         chat_id = kwargs['id']
         user = request.user
-        chat = get_object_or_404(models.Chat, chatusers__user=user, id__exact=chat_id)
-
-        # filter chatusers_set to only include current user
-        chat.chatusers_set.filter(user=user)
+        chat = get_object_or_404(models.Chat, pk=chat_id, chatusers__user=user)
 
         # serialize chat before updating chat_unread_status in db
         serializer = serializers.ChatDetailSerializer(chat)

@@ -46,7 +46,9 @@ class ChatMessageTest(TestCaseWithAuthenticatedUser):
         )
 
         self.assertEqual(response2.status_code, 200)
-        self.assertEqual(response2.data.get('chatusers_set')[0]['last_read'], self.message.id)
+        for status in response2.data.get('chatusers_set'):
+            if status['user']['id'] == self.user.id:
+                self.assertEqual(status['last_read'], self.message.id)
 
     def test_404_for_no_chat(self):
         non_existing_chat_id = 42
