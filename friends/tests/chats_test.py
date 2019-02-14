@@ -1,3 +1,5 @@
+import datetime
+
 from django.urls import reverse_lazy
 from .test_case_with_authenticated_user import TestCaseWithAuthenticatedUser
 
@@ -59,6 +61,42 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
 
     def test_while_others_chat_you_dont_see_them(self):
         self.addChat([self.user2, self.user3])
+
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(0, len(response.data))
+
+    def test_chat_for_expired_round(self):
+        self.addRounds()
+        self.addChat([self.user, self.user2], self.round1)
+        self.round1.users.add(self.user)
+        self.round1.start_timestamp += datetime.timedelta(days=-1)
+        self.round1.end_timestamp += datetime.timedelta(days=-1)
+        self.round1.save()
+
+        response = self.client.get(
+            reverse_lazy(self.view()),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(1, len(response.data))
+
+    def test_no_chat_for_current_round(self):
+        self.addRounds()
+        self.addChat([self.user, self.user2], self.round1)
+        self.round1.users.add(self.user)
+        self.round1.start_timestamp += datetime.timedelta(days=-1)
+        self.round1.end_timestamp += datetime.timedelta(days=+1)
+        self.round1.save()
 
         response = self.client.get(
             reverse_lazy(self.view()),

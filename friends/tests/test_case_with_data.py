@@ -110,9 +110,9 @@ class TestCaseWithData(TestCase):
             username='+490123456789',
             email='migrated.legacy@example.com', )
 
-    def addChat(self, users):
+    def addChat(self, users, round=None):
         self.chat1 = models.Chat.objects.create(
-            round=None,
+            round=round,
             initial_type=models.CHAT_TYPE_TEXT,
             type=models.CHAT_TYPE_TEXT
         )
