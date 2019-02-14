@@ -6,7 +6,6 @@ from django.utils import timezone
 from .. import models
 from .. import serializers
 
-
 class Chats(APIView):
 
     def get(self, request, **kwargs):

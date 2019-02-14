@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from . import models
 
-
 class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Color
@@ -162,6 +161,22 @@ class ChatDetailSerializer(serializers.ModelSerializer):
 class ChatOverviewSerializer(serializers.ModelSerializer):
     chatusers_set = ChatUsersSerializer(many=True)
 
+    last_message = serializers.SerializerMethodField()
+    def get_last_message(self, chat):
+        return MessageSerializer(chat.messages.last()).data
+
+    unread_messages = serializers.SerializerMethodField()
+    def get_unread_messages(self, chat):
+        unread_messages_dict = {}
+
+        for chatuser in chat.chatusers_set.all():
+          if chatuser.last_read == None:
+            unread_messages_dict[chatuser.user.id] = chatuser.chat.messages.all().count()
+          else:
+            unread_messages_dict[chatuser.user.id] = chatuser.chat.messages.filter(id__gt=chatuser.last_read.id).count()
+
+        return unread_messages_dict
+
     class Meta:
         model = models.Chat
         fields = [
@@ -169,4 +184,8 @@ class ChatOverviewSerializer(serializers.ModelSerializer):
             'round',
             'type',
             'chatusers_set',
+            'last_message',
+            'unread_messages',
         ]
+
+

@@ -128,3 +128,10 @@ class TestCaseWithData(TestCase):
             sender=self.user,
             text="Hello World!",
         )
+
+    def addSecondMessage(self):
+        self.message2 = models.Message.objects.create(
+            chat=self.chat1,
+            sender=self.user,
+            text="Hello World Again!",
+        )
