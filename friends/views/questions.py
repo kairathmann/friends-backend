@@ -11,7 +11,7 @@ class Questions(APIView):
         user = request.user
 
         # Only include questions that haven't been answered by the user yet
-        questions = models.SurveyQuestion.objects.exclude(answers__responses__user=user)
+        questions = models.SurveyQuestion.objects.exclude(answers__responses__user=user).distinct()
 
         # Exclude multiresponse questions
         questions = questions.filter(max_answers=1)
