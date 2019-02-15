@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import socket
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,11 +26,10 @@ SECRET_KEY = '!3c79l6!v87bj!9*s__uc-)bzbgo^*7h7+4+kh2^9^6=ohv(2%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '.elasticbeanstalk.com',
-    '*',  # TODO support AWS health checker
-]
+# ELB HealthCheck uses the EC2 instance's IP for its Host header
+local_ip = str(socket.gethostbyname(socket.gethostname()))
+
+ALLOWED_HOSTS = [local_ip, "localhost", ".meetluna.com", ".compute.amazonaws.com", ".elasticbeanstalk.com"]
 
 
 # Application definition
@@ -135,7 +135,7 @@ AUTH_USER_MODEL = 'friends.LunaUser'
 # Phone verification
 
 # Disabling Authy for development
-AUTHY_DISABLE = int(os.environ['AUTHY_DISABLE'])
+AUTHY_DISABLE = int(os.environ.get('AUTHY_DISABLE', 1))
 
 # Authy Application Key
 AUTHY_ACCOUNT_SECURITY_API_KEY = os.environ.get('AUTHY_ACCOUNT_SECURITY_API_KEY')
