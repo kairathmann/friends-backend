@@ -2,5 +2,5 @@ authy
 awsebcli
 Django
 djangorestframework
-mysqlclient
 phonenumbers
+psycopg2-binary

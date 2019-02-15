@@ -1,10 +1,83 @@
 {
 	"info": {
-		"_postman_id": "e30edd25-305b-4211-8d1d-86c82add498e",
+		"_postman_id": "c99127de-373c-4436-9949-d81e4accca48",
 		"name": "Luminos",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "/api/v1/chats/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/chats/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"chats",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/chats/1/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/chats/1/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"chats",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/colors/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/colors/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"colors",
+						""
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "/api/v1/questions/",
 			"request": {
@@ -23,6 +96,31 @@
 						"api",
 						"v1",
 						"questions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/questions/answered",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/questions/answered/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"questions",
+						"answered",
 						""
 					]
 				}
@@ -84,6 +182,32 @@
 			"response": []
 		},
 		{
+			"name": "/api/v1/rounds/1/chats/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/v1/rounds/1/chats/",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"rounds",
+						"1",
+						"chats",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/api/v1/rounds/subscribe/",
 			"request": {
 				"method": "POST",
@@ -121,13 +245,12 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"type": "text",
 						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"city\": \"foo\",\n\t\"first_name\": \"bar\"\n}"
+					"raw": "{\n\t\"city\": \"Łaziska\",\n\t\"first_name\": \"bar\",\n\t\"color\": 1,\n\t\"emoji\": \"🙈\"\n}"
 				},
 				"url": {
 					"raw": "{{HOST}}/api/v1/self/",
@@ -245,27 +368,5 @@
 				"type": "string"
 			}
 		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"id": "44dad883-f477-4ac9-9898-80dc60172235",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"id": "13c44ce1-dfbc-4317-96a0-b5e4f8b2e419",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	]
+	}
 }

@@ -1,0 +1,40 @@
+version: "3"
+services:
+  backend:
+    container_name: friends-backend
+    build: .
+    env_file:
+      - config.env
+    environment:
+      - PYTHONUNBUFFERED=0
+    ports:
+      - 8000:8000
+    volumes:
+      - ./friends:/srv/friends
+      - ./manage.py:/srv/manage.py
+      - ./run_django_docker.sh:/srv/run_django_docker.sh
+      - ./wait-for-it.sh:/srv/wait-for-it.sh
+    command:
+      [
+        "./srv/wait-for-it.sh",
+        "database:5432",
+        "--",
+        "./srv/run_django_docker.sh",
+      ]
+    depends_on:
+      - database
+    links:
+      - database:database
+  database:
+    image: mdillon/postgis:10-alpine
+    container_name: database
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=luminos
+      - POSTGRES_USER=masteruser
+      - POSTGRES_PASSWORD=pass_luminos_db_docker
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+    volumes:
+      - ./database/postgres:/var/lib/postgresql/data:z

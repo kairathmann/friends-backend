@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db import IntegrityError
+from django.db import transaction
 from django.dispatch import receiver
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
@@ -31,6 +33,17 @@ GENDER_IDS = (
     (GENDER_ID_OTHER, 'other'),
 )
 
+COLOR_MAX_LENGTH = 6
+EMOJI_MAX_LENGTH = 4
+
+
+class Color(models.Model):
+    """
+    A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
+    Colors are limited to 8 choices.
+    """
+    hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
+
 
 class LunaUser(AbstractUser):
     """
@@ -38,6 +51,8 @@ class LunaUser(AbstractUser):
     """
 
     city = models.CharField(max_length=CITY_MAX_LENGTH, db_index=True)
+    color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
+    emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
 
 
 class LegacyDataSet(models.Model):
@@ -158,3 +173,54 @@ class Round(models.Model):
 
     class Meta:
         ordering = ['start_timestamp', ]
+
+
+CHAT_TYPE_FREE = 1
+CHAT_TYPE_TEXT = 2
+CHAT_TYPE_LONGTEXT = 3
+CHAT_TYPE_VIDEO = 4
+
+CHAT_TYPES = (
+    (CHAT_TYPE_FREE, "Free"),
+    (CHAT_TYPE_TEXT, "Text"),
+    (CHAT_TYPE_LONGTEXT, "Longtext"),
+    (CHAT_TYPE_VIDEO, "Video"),
+)
+
+
+class Chat(models.Model):
+    """
+    A chat!
+    """
+
+    round = models.ForeignKey(Round, null=True, on_delete=models.DO_NOTHING)
+
+    # The type that was initially set for this chat during a Round, if applicable.
+    # Only used for data analysis.
+    initial_type = models.PositiveSmallIntegerField(choices=CHAT_TYPES)
+
+    # The current type of this chat. Returned by the API.
+    type = models.PositiveSmallIntegerField(choices=CHAT_TYPES)
+
+
+class Message(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
+
+    # null for system messages
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+
+    text = models.TextField()
+
+    timestamp = models.DateTimeField(default=timezone.now)
+
+
+class ChatUsers(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    # There may be a clever trigger on on_delete to find the next last-read message.
+    last_read = models.ForeignKey(Message, null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        unique_together = ('chat', 'user')
