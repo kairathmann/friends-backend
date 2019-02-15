@@ -1,3 +1,4 @@
+from datetime import datetime
 from dateutil import parser
 from . import models
 import csv
@@ -5,6 +6,22 @@ import pytz
 
 
 def import_legacy_users():
+
+    # rounds
+
+    round1 = models.Round.objects.create(
+        id=1,
+        start_timestamp=pytz.UTC.localize(datetime(2018, 12, 3, 0, 0, 0, 0)),
+        end_timestamp=pytz.UTC.localize(datetime(2018, 12, 9, 23, 59, 59, 999999)),
+    )
+
+    round2 = models.Round.objects.create(
+        id=2,
+        start_timestamp=pytz.UTC.localize(datetime(2018, 12, 27, 0, 0, 0, 0)),
+        end_timestamp=pytz.UTC.localize(datetime(2019, 1, 13, 23, 59, 59, 999999)),
+    )
+
+    # questions and answers
 
     q_qualities = models.SurveyQuestion.objects.create(
         text='What are the 3 most important qualities to you in meeting & friending someone?',
@@ -426,10 +443,10 @@ def import_legacy_users():
             # User data
 
             good_user = row['Good User?'] == 'TRUE'
-            name = row['What would you like to be called?']
+            name = row['What would you like to be called?'][:models.FIRST_NAME_MAX_LENGTH]
             entry_round = int(row['Entry Round'])
-            email = row['Email'].lower()
-            telegram = row['Telegram account']
+            email = row['Email'].lower()[:models.EMAIL_MAX_LENGTH]
+            telegram = row['Telegram account'][:models.LEGACY_TELEGRAM_MAX_LENGTH]
             raw_gender = row['What\'s your current gender identity?']
             if raw_gender == 'Male':
                 gender = models.GENDER_ID_MALE
@@ -438,11 +455,11 @@ def import_legacy_users():
             else:
                 gender = models.GENDER_ID_OTHER
             age = int(row['What\'s your age?'])
-            location = row['What\'s your location?']
+            location = row['What\'s your location?'][:models.CITY_MAX_LENGTH]
             expect_match_well = row['How well do you think we could match you based on these questions?'] == 'Well'
             missing_from_questions = row['What, if anything, do you think is missing from our questions?']
             submitted_at = pytz.UTC.localize(parser.parse(row['Submitted At']))
-            token = row['Token']
+            token = row['Token'][:models.LEGACY_TOKEN_MAX_LENGTH]
             user = models.LunaUser.objects.create_user(
                 username=email,
                 email=email,
@@ -464,6 +481,12 @@ def import_legacy_users():
                 submitted_at=submitted_at,
                 token=token,
             )
+            if entry_round == 1:
+                round1.users.add(user)
+
+            # Simplification: Every user from round 1 is also assigned to round 2.
+            if entry_round >= 1:
+                round2.users.add(user)
 
             # Question data
 
