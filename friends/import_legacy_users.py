@@ -439,7 +439,11 @@ def import_legacy_users():
 
     with open('legacy_users.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=',')
+        count = 1
         for row in reader:
+            print('Importing row {}'.format(count))
+            count += 1
+
             # User data
 
             good_user = row['Good User?'] == 'TRUE'
