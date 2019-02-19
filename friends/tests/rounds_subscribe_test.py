@@ -106,7 +106,7 @@ class RoundsSubscribeTest(TestCaseWithAuthenticatedUser):
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
-                'is_subscribed': False,
+                'is_subscribed': True,
                 'round_id': self.round1.id,
             }),
             content_type='application/json',
@@ -115,4 +115,3 @@ class RoundsSubscribeTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'not_all_questions_answered')
-        

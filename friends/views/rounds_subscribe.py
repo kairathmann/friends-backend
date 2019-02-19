@@ -14,7 +14,7 @@ class RoundsSubscribe(APIView):
         user = request.user
 
         # Check if user has answered all questions
-        if not is_subscribed:
+        if is_subscribed:
             survey_questions_count = models.SurveyQuestion.objects.filter(max_answers=1).count()
             user_responses_count = models.SurveyResponse.objects.filter(user=user).count()
             if survey_questions_count != user_responses_count:
