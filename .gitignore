@@ -4,6 +4,7 @@
 db.sqlite3
 venv/
 configexport.sh
+legacy_users.csv
 
 #======================================
 # OS generated
