@@ -27,7 +27,7 @@ class TestCaseWithData(TestCase):
             description='description2',
         )
 
-    def addSurvey(self):
+    def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(
             text='text1',
         )
@@ -54,16 +54,17 @@ class TestCaseWithData(TestCase):
             text='text2b',
             order_index=0,
         )
-        self.response2 = models.SurveyResponse.objects.create(
-            user=self.user,
-            answer=self.answer2a,
-        )
+        if add_responses:
+            self.response2 = models.SurveyResponse.objects.create(
+                user=self.user,
+                answer=self.answer2a,
+            )
 
-        # Response 2b is current response now as is created a few ms after response2
-        self.response2b = models.SurveyResponse.objects.create(
-            user=self.user,
-            answer=self.answer2b,
-        )
+            # Response 2b is current response now as is created a few ms after response2
+            self.response2b = models.SurveyResponse.objects.create(
+                user=self.user,
+                answer=self.answer2b,
+            )
 
     def addMultiResponseQuestion(self):
         self.multi_response_question1 = models.SurveyQuestion.objects.create(

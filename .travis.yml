@@ -1,7 +1,23 @@
 language: python
 python:
-  - "3.6"
+- '3.6'
 script:
-  - source export_local.sh
-  - python manage.py migrate
-  - python manage.py test
+- source export_local.sh
+- python manage.py migrate
+- python manage.py test
+deploy:
+  # https://docs.travis-ci.com/user/deployment/elasticbeanstalk/
+  provider: elasticbeanstalk
+  # IAM user 'travis' on AWS dev organization
+  access_key_id:
+    # travis encrypt --com "<aws access key id>"
+    secure: Ii0RRPZRThb6e/iaCb0itZqAtHzeCcrE/uk6Q+W0f8ijoAUoPo+QXE/aA2W/hsBRbbf4xsAFbVddv6K/Ole5nGAbeP58J9wGcOeE1NTORaSVT6YIKM5jN0d4ti+pEwBLie0SuGPG5e/ZHBHqLJfge9zTbek/hDCLoi8Pww14hnb0HcXwmAFgLPNBek04WbIM5PPb97IzqeWtgta1GgfNRhTodR9DJFomxZGJx3nEuAxLZtDhgxFES0udYuB+jbhCIBSL0VodnbXcYt0Qj6IGrWAulOBPKEQemK7k0DX8L5uK7UDn8KUFLjXsUTfVrRmG+QaWvsAePtsg9NEKFKh6p8r+hJfSFOYr7icpv9l9f35ZYsmOw73USmARwLLzW0gFSw6hula38FHwYliYoul4TkLcOBD5H/WFNMCCNPjzB1DpC4SFIPFPp6AAPDqsZRFXo2FVVAKD0lvovLzXPNhRU3HG8ZtniXRhZkoZ9zA3OjPiujkGEr8GiXoNkBvUqc2j3CssS70BlJaS5FhGzjrea+DoO6JiUB+TNrFUlXVqqJTqDmpct3CKhU4fLqhlHg5TEkvcgOGy3FbDk15Kb/b+tELtIOwZeNTkhFQF+7LTPO8MUVq+mZ/dZD6KhbbT7MtyWs1FW9NM7Fe2MyO4s9xZV179aN75C6dmFDEDyrrxsqs=
+  secret_access_key:
+    # travis encrypt --com "<aws secret access key>"
+    secure: PQIvKU+WcGlki2nosdFUfxG4jnPtlVQamm8rQhdngejB4XRk4V0PjCKXnlxIGPCvUn5s25zqX57L6IvkQWYxRfS7kPBXEWyQts2YtjYC19d2oJvEIwYbnDjVWSmaPMkPLekDkT9f5E2qIbfnyw3SrvkSlm9OXMZxW2/o3neHQ2ix+3VuZJzh3MR8PZ6l7bJSstin2nJTMiQkWieuYv4fWt6KOmlxKJnnN4C/uYVoz7MKz5X7SqjGVDiSFXq6IGS95vc6H5WqCB9WWk5ZnIX5KhzVBjaccl3EU2cMXXiXRsaaF5FZYF1jTf/ccQuLOtPcVigiqgeJQfRS6xbbcSDeJYTz0fuEgBYZeOrtWP+bz/KyTcR/65UAs5PVDcZrAshalUwE42KYg+5azNEXAQFyRSb4K5cNFNjOVSiTjS3Af4xE06jwHHJMZAYCyd4REVt2JArQbATtfUJa5deT5+Ps5emszdcpjxemzbfL1V73dhbigjoCDCnEUumT3gkUr2kZ/5JZV06C7xRDWzlSI2EYDffX7jcClxwWSFw4mNKHsZZzzWfxtn06gA8w6iABfILOV2GTcJsB4jLUvGs9o9lveTMK2lSRwBAJ1xbGyrE8wAGBrqveeyuvHUBcjG/A8irFWpAOGO8LpQ+o0e3kaMlzAKaGw+mM3a+DKarnNJMWZe4=
+  region: eu-central-1
+  app: friends
+  env: friends-dev
+  bucket_name: luminos-travis
+  on:
+    branch: develop

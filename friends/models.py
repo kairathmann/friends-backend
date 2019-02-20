@@ -1,13 +1,14 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db import IntegrityError
-from django.db import transaction
 from django.dispatch import receiver
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 CITY_MAX_LENGTH = 35
+
+# From django.db.models.fields.EmailField
+EMAIL_MAX_LENGTH = 254
 
 # From django.contrib.auth.models.AbstractUser
 FIRST_NAME_MAX_LENGTH = 30

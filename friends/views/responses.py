@@ -32,8 +32,6 @@ class Responses(APIView):
             return Response('answer_ids_invalid', status=status.HTTP_400_BAD_REQUEST)
         except models.SurveyAnswer.DoesNotExist:
             return Response('answer_ids_unknown', status=status.HTTP_400_BAD_REQUEST)
-        except IntegrityError:
-            return Response('response_duplicate', status=status.HTTP_400_BAD_REQUEST)
 
         serializer = serializers.SurveyResponseSerializer(responses, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
