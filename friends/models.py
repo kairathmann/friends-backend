@@ -41,9 +41,9 @@ EMOJI_MAX_LENGTH = 4
 class Color(models.Model):
     """
     A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
-    Colors are limited to 8 choices.
     """
     hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
+    brian_bot = models.BooleanField(default=False) # For the special Brian Bot color (not available to other users)
 
 
 class LunaUser(AbstractUser):
@@ -213,3 +213,22 @@ class ChatUsers(models.Model):
 
     class Meta:
         unique_together = ('chat', 'user')
+
+
+@receiver(models.signals.post_save, sender=LunaUser)
+def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
+    if created and not instance.is_staff:
+
+        # Create text chat
+        chat = Chat.objects.create(initial_type=CHAT_TYPE_TEXT, type=CHAT_TYPE_TEXT)
+        chat.save()
+
+        # Add Brian Bot to chat
+        brian_bot_color = Color.objects.get(brian_bot=True)
+        brian_bot = LunaUser.objects.get(is_staff=True, color=brian_bot_color)
+        ChatUsers.objects.create(chat=chat, user=brian_bot)
+
+        # Add newly created user to chat
+        ChatUsers.objects.create(chat=chat, user=instance)
+
+

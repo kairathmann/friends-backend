@@ -26,7 +26,7 @@ class LunaUserSerializer(serializers.ModelSerializer):
             'first_name',
             'username',
             'color',
-            'emoji'
+            'emoji',
         ]
 
 
@@ -44,7 +44,7 @@ class LunaUserPartnerSerializer(serializers.ModelSerializer):
             'city',
             'first_name',
             'color',
-            'emoji'
+            'emoji',
         ]
 
 

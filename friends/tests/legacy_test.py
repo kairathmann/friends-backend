@@ -6,6 +6,7 @@ from .test_case_with_data import TestCaseWithData
 class LegacyTest(TestCaseWithData):
     def setUp(self):
         super(LegacyTest, self).setUp()
+        self.addBrianBot()
         self.addLegacyUsers()
 
     def view(self):

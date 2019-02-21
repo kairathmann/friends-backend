@@ -22,9 +22,10 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
             }),
             content_type='application/json',
         )
+
         self.assertEqual(response.status_code, 201, response.data)
         # Get new database user
-        new_user = models.LunaUser.objects.exclude(id=self.user.id).get()
+        new_user = models.LunaUser.objects.filter(is_staff=False).exclude(id=self.user.id).get()
         self.assertEqual(response.data['id'], new_user.id)
         self.assertEqual(response.data['auth_token'], new_user.auth_token.key)
         self.assertEqual(response.data['city'], '')
@@ -35,6 +36,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         """
         This test is about posting to verification_token as an authenticated (legacy) user.
         """
+        self.removeBrianBot()
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
