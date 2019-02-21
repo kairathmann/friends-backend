@@ -148,3 +148,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     )
 }
+
+# OneSignal API Settings
+ONESIGNAL_DISABLE = os.environ.get('ONESIGNAL_DISABLE')
+
+if ONESIGNAL_DISABLE != "1":
+    ONESIGNAL_API_ENDPOINT = os.environ['ONESIGNAL_API_ENDPOINT']
+    ONESIGNAL_AUTHORIZATION_HEADER = os.environ['ONESIGNAL_AUTHORIZATION_HEADER']
+    ONESIGNAL_APPID = os.environ['ONESIGNAL_APPID']

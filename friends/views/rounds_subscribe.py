@@ -3,15 +3,32 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .. import models
+from ..utilities.validation_utility import ValidationUtility
 
 
 class RoundsSubscribe(APIView):
 
     @transaction.atomic
     def post(self, request):
-        is_subscribed = request.data.get('is_subscribed')
-        round_id = request.data.get('round_id')
         user = request.user
+
+        # Get round_id as int
+        round_id, error_response = ValidationUtility().validate_data_object(request.data, 'round_id', int)
+        if error_response:
+            return error_response
+
+        # Find round
+        try:
+            round = models.Round.objects.get(id=round_id)
+        except models.Round.DoesNotExist:
+            return Response('round_id_not_found', status=status.HTTP_400_BAD_REQUEST)
+
+        # Get is_subscribed
+        is_subscribed = request.data.get('is_subscribed')
+
+        # Check validity of is_subscribed
+        if not isinstance(is_subscribed, bool):
+            return Response('is_subscribed_invalid', status=status.HTTP_400_BAD_REQUEST)
 
         # Check if user has answered all questions
         if is_subscribed:
@@ -26,24 +43,6 @@ class RoundsSubscribe(APIView):
                 count()
             if survey_questions_count != user_responses_count:
                 return Response('not_all_questions_answered', status=status.HTTP_400_BAD_REQUEST)
-
-        # Check for None or ''
-        if not round_id:
-            return Response('round_id_missing', status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate
-        if not isinstance(is_subscribed, bool):
-            return Response('is_subscribed_invalid', status=status.HTTP_400_BAD_REQUEST)
-        try:
-            round_id_int = int(round_id)
-        except ValueError:
-            return Response('round_id_invalid', status=status.HTTP_400_BAD_REQUEST)
-
-        # Find
-        try:
-            round = models.Round.objects.get(id=round_id_int)
-        except models.Round.DoesNotExist:
-            return Response('round_id_not_found', status=status.HTTP_400_BAD_REQUEST)
 
         old_is_subscribed = round.users.filter(id=user.id).exists()
         if is_subscribed and not old_is_subscribed:

@@ -45,7 +45,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'city_missing')
+        self.assertEqual(response.data, 'city_field_not_found')
 
     def test_put_first_name_missing(self):
         response = self.client.put(
@@ -59,7 +59,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'first_name_missing')
+        self.assertEqual(response.data, 'first_name_field_not_found')
 
     def test_put_color_missing(self):
         response = self.client.put(
@@ -73,7 +73,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'color_missing')
+        self.assertEqual(response.data, 'color_field_not_found')
 
     def test_put_color_invalid_id(self):
         response = self.client.put(
@@ -102,7 +102,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'emoji_missing')
+        self.assertEqual(response.data, 'emoji_field_not_found')
 
     def test_get(self):
         response = self.client.get(

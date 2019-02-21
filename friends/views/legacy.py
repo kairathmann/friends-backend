@@ -5,13 +5,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .. import models
 from .. import serializers
+from ..utilities.validation_utility import ValidationUtility
 
 
 class Legacy(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        email = request.data.get('email')
+        email, error_response = ValidationUtility().validate_data_object(request.data, "email", str)
+        if error_response:
+            return error_response
 
         # Success: user exists and has not been transferred
         if models.LunaUser.objects.filter(username=email).exists():

@@ -53,7 +53,7 @@ class RoundsSubscribeTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'round_id_missing')
+        self.assertEqual(response.data, 'round_id_field_not_found')
 
     def test_post_400_is_subscribed_invalid(self):
         response = self.client.post(
