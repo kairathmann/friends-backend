@@ -9,6 +9,8 @@ class TestCaseWithData(TestCase):
         models.Color.objects.all().delete()
         models.Color.objects.create(id=1, hex_value='AABBCC')
         models.Color.objects.create(id=2, hex_value='ABABAB')
+        # Remove questions that are inserted by default
+        models.SurveyQuestion.objects.all().delete()
 
     def tearDown(self):
         models.Chat.objects.all().delete()

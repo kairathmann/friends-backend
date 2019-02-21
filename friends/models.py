@@ -105,10 +105,12 @@ class SurveyQuestion(models.Model):
     referencing it.
     """
 
-    text = models.CharField(max_length=SURVEY_QUESTION_TEXT_MAX_LENGTH)
+    text = models.CharField(max_length=SURVEY_QUESTION_TEXT_MAX_LENGTH, unique=True)
 
     # The maximum number of answers a user may select for this question.
     max_answers = models.PositiveSmallIntegerField(default=1)
+
+    is_enabled = models.BooleanField(default=True)
 
 
 class SurveyAnswer(models.Model):
@@ -144,7 +146,7 @@ class FreeTextQuestion(models.Model):
     A FreeTextQuestion is a question allowing a user to type a free text answer.
     """
 
-    text = models.CharField(max_length=FREE_TEXT_QUESTION_MAX_LENGTH)
+    text = models.CharField(max_length=FREE_TEXT_QUESTION_MAX_LENGTH, unique=True)
 
 
 class FreeTextResponse(models.Model):
@@ -153,6 +155,8 @@ class FreeTextResponse(models.Model):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    question = models.ForeignKey(FreeTextQuestion, related_name='responses', on_delete=models.CASCADE)
 
     text = models.TextField()
 

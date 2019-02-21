@@ -15,8 +15,15 @@ class RoundsSubscribe(APIView):
 
         # Check if user has answered all questions
         if is_subscribed:
-            survey_questions_count = models.SurveyQuestion.objects.filter(max_answers=1).count()
-            user_responses_count = models.SurveyResponse.objects.filter(user=user).count()
+            survey_questions_count = models.SurveyQuestion.objects.\
+                filter(max_answers=1).\
+                exclude(is_enabled=False).\
+                count()
+            user_responses_count = models.SurveyResponse.objects.\
+                filter(user=user).\
+                filter(answer__question__max_answers=1).\
+                exclude(answer__question__is_enabled=False).\
+                count()
             if survey_questions_count != user_responses_count:
                 return Response('not_all_questions_answered', status=status.HTTP_400_BAD_REQUEST)
 

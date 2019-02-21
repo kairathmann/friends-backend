@@ -23,415 +23,415 @@ def import_legacy_users():
 
     # questions and answers
 
-    q_qualities = models.SurveyQuestion.objects.create(
+    q_qualities = models.SurveyQuestion.objects.get(
         text='What are the 3 most important qualities to you in meeting & friending someone?',
         max_answers=3,
     )
-    a_qualities_0 = models.SurveyAnswer.objects.create(
+    a_qualities_0 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=0,
         text='Background or subculture',
     )
-    a_qualities_1 = models.SurveyAnswer.objects.create(
+    a_qualities_1 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=1,
         text='Chemistry / “gut feeling”',
     )
-    a_qualities_2 = models.SurveyAnswer.objects.create(
+    a_qualities_2 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=2,
         text='Curiosity (esp. intellectual)',
     )
-    a_qualities_3 = models.SurveyAnswer.objects.create(
+    a_qualities_3 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=3,
         text='Interests - music, movies, food, hobbies, etc.',
     )
-    a_qualities_4 = models.SurveyAnswer.objects.create(
+    a_qualities_4 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=4,
         text='Looks',
     )
-    a_qualities_5 = models.SurveyAnswer.objects.create(
+    a_qualities_5 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=5,
         text='Personality/Demeanor',
     )
-    a_qualities_6 = models.SurveyAnswer.objects.create(
+    a_qualities_6 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=6,
         text='Shared sense of humor',
     )
-    a_qualities_7 = models.SurveyAnswer.objects.create(
+    a_qualities_7 = models.SurveyAnswer.objects.get(
         question=q_qualities,
         order_index=7,
         text='Shared values',
     )
-    q_meeting = models.FreeTextQuestion.objects.create(
+    q_meeting = models.FreeTextQuestion.objects.get(
         text='What are your favorite ways or services for meeting people?',
     )
-    q_inperson = models.SurveyQuestion.objects.create(
+    q_inperson = models.SurveyQuestion.objects.get(
         text='How important is it to you to be able to meet up in person with someone you\'re matched with?',
     )
-    a_inperson_0 = models.SurveyAnswer.objects.create(
+    a_inperson_0 = models.SurveyAnswer.objects.get(
         question=q_inperson,
         order_index=0,
         text='1',
     )
-    a_inperson_1 = models.SurveyAnswer.objects.create(
+    a_inperson_1 = models.SurveyAnswer.objects.get(
         question=q_inperson,
         order_index=1,
         text='2',
     )
-    a_inperson_2 = models.SurveyAnswer.objects.create(
+    a_inperson_2 = models.SurveyAnswer.objects.get(
         question=q_inperson,
         order_index=2,
         text='3',
     )
-    a_inperson_3 = models.SurveyAnswer.objects.create(
+    a_inperson_3 = models.SurveyAnswer.objects.get(
         question=q_inperson,
         order_index=3,
         text='4',
     )
-    a_inperson_4 = models.SurveyAnswer.objects.create(
+    a_inperson_4 = models.SurveyAnswer.objects.get(
         question=q_inperson,
         order_index=4,
         text='5',
     )
-    q_museum = models.SurveyQuestion.objects.create(
+    q_museum = models.SurveyQuestion.objects.get(
         text='You must visit a museum. You would you rather go to an \\_\\_\\_\\_\\_ museum',
     )
-    a_museum_0 = models.SurveyAnswer.objects.create(
+    a_museum_0 = models.SurveyAnswer.objects.get(
         question=q_museum,
         order_index=0,
         text='art',
     )
-    a_museum_1 = models.SurveyAnswer.objects.create(
+    a_museum_1 = models.SurveyAnswer.objects.get(
         question=q_museum,
         order_index=1,
         text='history',
     )
-    q_travelalone = models.SurveyQuestion.objects.create(
+    q_travelalone = models.SurveyQuestion.objects.get(
         text='Have you ever traveled around another country alone?',
     )
-    a_travelalone_0 = models.SurveyAnswer.objects.create(
+    a_travelalone_0 = models.SurveyAnswer.objects.get(
         question=q_travelalone,
         order_index=0,
         text='yes',
     )
-    a_travelalone_1 = models.SurveyAnswer.objects.create(
+    a_travelalone_1 = models.SurveyAnswer.objects.get(
         question=q_travelalone,
         order_index=1,
         text='no',
     )
-    q_political = models.SurveyQuestion.objects.create(
+    q_political = models.SurveyQuestion.objects.get(
         text='Can someone both be a kind person and also hold the exact opposite of your political views?',
     )
-    a_political_0 = models.SurveyAnswer.objects.create(
+    a_political_0 = models.SurveyAnswer.objects.get(
         question=q_political,
         order_index=0,
         text='yes',
     )
-    a_political_1 = models.SurveyAnswer.objects.create(
+    a_political_1 = models.SurveyAnswer.objects.get(
         question=q_political,
         order_index=1,
         text='no',
     )
-    q_niche = models.SurveyQuestion.objects.create(
-        text='I belong to online communities focused around niche interests.',
+    q_niche = models.SurveyQuestion.objects.get(
+        text='Do you belong to at least one online community focused around niche interests?',
     )
-    a_niche_0 = models.SurveyAnswer.objects.create(
+    a_niche_0 = models.SurveyAnswer.objects.get(
         question=q_niche,
         order_index=0,
         text='yes',
     )
-    a_niche_1 = models.SurveyAnswer.objects.create(
+    a_niche_1 = models.SurveyAnswer.objects.get(
         question=q_niche,
         order_index=1,
         text='no',
     )
-    q_suicide = models.SurveyQuestion.objects.create(
-        text='Do you prefer to live in a world where suicide is legal or illegal?',
+    q_suicide = models.SurveyQuestion.objects.get(
+        text='If you have to choose one, you believe suicide should be:',
     )
-    a_suicide_0 = models.SurveyAnswer.objects.create(
+    a_suicide_0 = models.SurveyAnswer.objects.get(
         question=q_suicide,
         order_index=0,
         text='legal',
     )
-    a_suicide_1 = models.SurveyAnswer.objects.create(
+    a_suicide_1 = models.SurveyAnswer.objects.get(
         question=q_suicide,
         order_index=1,
         text='illegal',
     )
-    q_rules = models.SurveyQuestion.objects.create(
+    q_rules = models.SurveyQuestion.objects.get(
         text='I feel \\_\\_\\_\\_\\_\\_\\_ around people who break rules.',
     )
-    a_rules_0 = models.SurveyAnswer.objects.create(
+    a_rules_0 = models.SurveyAnswer.objects.get(
         question=q_rules,
         order_index=0,
         text='comfortable',
     )
-    a_rules_1 = models.SurveyAnswer.objects.create(
+    a_rules_1 = models.SurveyAnswer.objects.get(
         question=q_rules,
         order_index=1,
         text='uncomfortable',
     )
-    q_horror = models.SurveyQuestion.objects.create(
+    q_horror = models.SurveyQuestion.objects.get(
         text='Do you like horror movies?',
     )
-    a_horror_0 = models.SurveyAnswer.objects.create(
+    a_horror_0 = models.SurveyAnswer.objects.get(
         question=q_horror,
         order_index=0,
         text='yes',
     )
-    a_horror_1 = models.SurveyAnswer.objects.create(
+    a_horror_1 = models.SurveyAnswer.objects.get(
         question=q_horror,
         order_index=1,
         text='no',
     )
-    q_jail = models.SurveyQuestion.objects.create(
+    q_jail = models.SurveyQuestion.objects.get(
         text='I daydream about how I would escape from jail.',
     )
-    a_jail_0 = models.SurveyAnswer.objects.create(
+    a_jail_0 = models.SurveyAnswer.objects.get(
         question=q_jail,
         order_index=0,
         text='yes',
     )
-    a_jail_1 = models.SurveyAnswer.objects.create(
+    a_jail_1 = models.SurveyAnswer.objects.get(
         question=q_jail,
         order_index=1,
         text='no',
     )
-    q_pranks = models.SurveyQuestion.objects.create(
+    q_pranks = models.SurveyQuestion.objects.get(
         text='I like pranks.',
     )
-    a_pranks_0 = models.SurveyAnswer.objects.create(
+    a_pranks_0 = models.SurveyAnswer.objects.get(
         question=q_pranks,
         order_index=0,
         text='yes',
     )
-    a_pranks_1 = models.SurveyAnswer.objects.create(
+    a_pranks_1 = models.SurveyAnswer.objects.get(
         question=q_pranks,
         order_index=1,
         text='no',
     )
-    q_enlighten = models.SurveyQuestion.objects.create(
+    q_enlighten = models.SurveyQuestion.objects.get(
         text='It is possible to obtain enlightenment through meditation.',
     )
-    a_enlighten_0 = models.SurveyAnswer.objects.create(
+    a_enlighten_0 = models.SurveyAnswer.objects.get(
         question=q_enlighten,
         order_index=0,
         text='yes',
     )
-    a_enlighten_1 = models.SurveyAnswer.objects.create(
+    a_enlighten_1 = models.SurveyAnswer.objects.get(
         question=q_enlighten,
         order_index=1,
         text='no',
     )
-    q_boat = models.SurveyQuestion.objects.create(
+    q_boat = models.SurveyQuestion.objects.get(
         text='Wouldn\'t it be fun to chuck it all and go live on a sailboat?',
     )
-    a_boat_0 = models.SurveyAnswer.objects.create(
+    a_boat_0 = models.SurveyAnswer.objects.get(
         question=q_boat,
         order_index=0,
         text='yes',
     )
-    a_boat_1 = models.SurveyAnswer.objects.create(
+    a_boat_1 = models.SurveyAnswer.objects.get(
         question=q_boat,
         order_index=1,
         text='no',
     )
-    q_jokes = models.SurveyQuestion.objects.create(
+    q_jokes = models.SurveyQuestion.objects.get(
         text='I make jokes that offend some people.',
     )
-    a_jokes_0 = models.SurveyAnswer.objects.create(
+    a_jokes_0 = models.SurveyAnswer.objects.get(
         question=q_jokes,
         order_index=0,
         text='yes',
     )
-    a_jokes_1 = models.SurveyAnswer.objects.create(
+    a_jokes_1 = models.SurveyAnswer.objects.get(
         question=q_jokes,
         order_index=1,
         text='no',
     )
-    q_similar = models.SurveyQuestion.objects.create(
+    q_similar = models.SurveyQuestion.objects.get(
         text='My friends are mostly \\_\\_\\_\\_\\_\\_\\_ me.',
     )
-    a_similar_0 = models.SurveyAnswer.objects.create(
+    a_similar_0 = models.SurveyAnswer.objects.get(
         question=q_similar,
         order_index=0,
         text='similar to',
     )
-    a_similar_1 = models.SurveyAnswer.objects.create(
+    a_similar_1 = models.SurveyAnswer.objects.get(
         question=q_similar,
         order_index=1,
         text='different from',
     )
-    q_evolution = models.SurveyQuestion.objects.create(
+    q_evolution = models.SurveyQuestion.objects.get(
         text='I believe in evolution.',
     )
-    a_evolution_0 = models.SurveyAnswer.objects.create(
+    a_evolution_0 = models.SurveyAnswer.objects.get(
         question=q_evolution,
         order_index=0,
         text='yes',
     )
-    a_evolution_1 = models.SurveyAnswer.objects.create(
+    a_evolution_1 = models.SurveyAnswer.objects.get(
         question=q_evolution,
         order_index=1,
         text='no',
     )
-    q_parties = models.SurveyQuestion.objects.create(
+    q_parties = models.SurveyQuestion.objects.get(
         text='I enjoy going to parties even if I don\'t know anyone.',
     )
-    a_parties_0 = models.SurveyAnswer.objects.create(
+    a_parties_0 = models.SurveyAnswer.objects.get(
         question=q_parties,
         order_index=0,
         text='yes',
     )
-    a_parties_1 = models.SurveyAnswer.objects.create(
+    a_parties_1 = models.SurveyAnswer.objects.get(
         question=q_parties,
         order_index=1,
         text='no',
     )
-    q_promise = models.SurveyQuestion.objects.create(
+    q_promise = models.SurveyQuestion.objects.get(
         text='I keep my word and expect others to.',
     )
-    a_promise_0 = models.SurveyAnswer.objects.create(
+    a_promise_0 = models.SurveyAnswer.objects.get(
         question=q_promise,
         order_index=0,
         text='yes',
     )
-    a_promise_1 = models.SurveyAnswer.objects.create(
+    a_promise_1 = models.SurveyAnswer.objects.get(
         question=q_promise,
         order_index=1,
         text='no',
     )
-    q_secrets = models.SurveyQuestion.objects.create(
+    q_secrets = models.SurveyQuestion.objects.get(
         text='I keep secrets well.',
     )
-    a_secrets_0 = models.SurveyAnswer.objects.create(
+    a_secrets_0 = models.SurveyAnswer.objects.get(
         question=q_secrets,
         order_index=0,
         text='yes',
     )
-    a_secrets_1 = models.SurveyAnswer.objects.create(
+    a_secrets_1 = models.SurveyAnswer.objects.get(
         question=q_secrets,
         order_index=1,
         text='no',
     )
-    q_conflict = models.SurveyQuestion.objects.create(
+    q_conflict = models.SurveyQuestion.objects.get(
         text='I tend to avoid conflict.',
     )
-    a_conflict_0 = models.SurveyAnswer.objects.create(
+    a_conflict_0 = models.SurveyAnswer.objects.get(
         question=q_conflict,
         order_index=0,
         text='yes',
     )
-    a_conflict_1 = models.SurveyAnswer.objects.create(
+    a_conflict_1 = models.SurveyAnswer.objects.get(
         question=q_conflict,
         order_index=1,
         text='no',
     )
-    q_horoscopes = models.SurveyQuestion.objects.create(
+    q_horoscopes = models.SurveyQuestion.objects.get(
         text='I think horoscopes are fun.',
     )
-    a_horoscopes_0 = models.SurveyAnswer.objects.create(
+    a_horoscopes_0 = models.SurveyAnswer.objects.get(
         question=q_horoscopes,
         order_index=0,
         text='yes',
     )
-    a_horoscopes_1 = models.SurveyAnswer.objects.create(
+    a_horoscopes_1 = models.SurveyAnswer.objects.get(
         question=q_horoscopes,
         order_index=1,
         text='no',
     )
-    q_fiction = models.SurveyQuestion.objects.create(
+    q_fiction = models.SurveyQuestion.objects.get(
         text='Fictional stories (books, film, TV series, etc) are one of my most common conversational topics.',
     )
-    a_fiction_0 = models.SurveyAnswer.objects.create(
+    a_fiction_0 = models.SurveyAnswer.objects.get(
         question=q_fiction,
         order_index=0,
         text='yes',
     )
-    a_fiction_1 = models.SurveyAnswer.objects.create(
+    a_fiction_1 = models.SurveyAnswer.objects.get(
         question=q_fiction,
         order_index=1,
         text='no',
     )
-    q_trans = models.SurveyQuestion.objects.create(
+    q_trans = models.SurveyQuestion.objects.get(
         text='I would be open to dating a transsexual person.',
     )
-    a_trans_0 = models.SurveyAnswer.objects.create(
+    a_trans_0 = models.SurveyAnswer.objects.get(
         question=q_trans,
         order_index=0,
         text='yes',
     )
-    a_trans_1 = models.SurveyAnswer.objects.create(
+    a_trans_1 = models.SurveyAnswer.objects.get(
         question=q_trans,
         order_index=1,
         text='no',
     )
-    q_controversial = models.SurveyQuestion.objects.create(
+    q_controversial = models.SurveyQuestion.objects.get(
         text='Do you hold any controversial views (on society, politics, culture, etc.) that you would feel afraid to express on social media or to your wider friend group?',
     )
-    a_controversial_0 = models.SurveyAnswer.objects.create(
+    a_controversial_0 = models.SurveyAnswer.objects.get(
         question=q_controversial,
         order_index=0,
         text='yes',
     )
-    a_controversial_1 = models.SurveyAnswer.objects.create(
+    a_controversial_1 = models.SurveyAnswer.objects.get(
         question=q_controversial,
         order_index=1,
         text='no',
     )
-    q_smartdrugs = models.SurveyQuestion.objects.create(
+    q_smartdrugs = models.SurveyQuestion.objects.get(
         text='I would take drugs to make myself smarter if they existed.',
     )
-    a_smartdrugs_0 = models.SurveyAnswer.objects.create(
+    a_smartdrugs_0 = models.SurveyAnswer.objects.get(
         question=q_smartdrugs,
         order_index=0,
         text='yes',
     )
-    a_smartdrugs_1 = models.SurveyAnswer.objects.create(
+    a_smartdrugs_1 = models.SurveyAnswer.objects.get(
         question=q_smartdrugs,
         order_index=1,
         text='no',
     )
-    q_commitment = models.SurveyQuestion.objects.create(
+    q_commitment = models.SurveyQuestion.objects.get(
         text='My choices mostly reflect a commitment to \\_\\_\\_\\_\\_\\_\\_.',
     )
-    a_commitment_0 = models.SurveyAnswer.objects.create(
+    a_commitment_0 = models.SurveyAnswer.objects.get(
         question=q_commitment,
         order_index=0,
         text='myself',
     )
-    a_commitment_1 = models.SurveyAnswer.objects.create(
+    a_commitment_1 = models.SurveyAnswer.objects.get(
         question=q_commitment,
         order_index=1,
         text='my loved ones',
     )
-    q_openup = models.SurveyQuestion.objects.create(
+    q_openup = models.SurveyQuestion.objects.get(
         text='It takes me longer than average to open up / become comfortable around strangers.',
     )
-    a_openup_0 = models.SurveyAnswer.objects.create(
+    a_openup_0 = models.SurveyAnswer.objects.get(
         question=q_openup,
         order_index=0,
         text='yes',
     )
-    a_openup_1 = models.SurveyAnswer.objects.create(
+    a_openup_1 = models.SurveyAnswer.objects.get(
         question=q_openup,
         order_index=1,
         text='no',
     )
-    q_worry = models.SurveyQuestion.objects.create(
+    q_worry = models.SurveyQuestion.objects.get(
         text='I worry my friends or partners will leave me.',
     )
-    a_worry_0 = models.SurveyAnswer.objects.create(
+    a_worry_0 = models.SurveyAnswer.objects.get(
         question=q_worry,
         order_index=0,
         text='yes',
     )
-    a_worry_1 = models.SurveyAnswer.objects.create(
+    a_worry_1 = models.SurveyAnswer.objects.get(
         question=q_worry,
         order_index=1,
         text='no',
@@ -519,6 +519,7 @@ def import_legacy_users():
             r_meeting = row[q_meeting.text]
             models.FreeTextResponse.objects.create(
                 user=user,
+                question=q_meeting,
                 text=r_meeting,
                 timestamp=submitted_at,
             )
@@ -572,18 +573,20 @@ def import_legacy_users():
                 timestamp=submitted_at,
             )
 
-            # I belong to online communities focused around niche interests.
+            # Do you belong to at least one online community focused around niche interests?
 
-            r_niche = row[q_niche.text] == 'TRUE'
+            # text differs between csv and migration, hence not looking up by question text field
+            r_niche = row['I belong to online communities focused around niche interests.'] == 'TRUE'
             models.SurveyResponse.objects.create(
                 user=user,
                 answer=a_niche_0 if r_niche else a_niche_1,
                 timestamp=submitted_at,
             )
 
-            # Do you prefer to live in a world where suicide is legal or illegal?
+            # If you have to choose one, you believe suicide should be:
 
-            r_suicide = row[q_suicide.text] == 'legal'
+            # text differs between csv and migration, hence not looking up by question text field
+            r_suicide = row['Do you prefer to live in a world where suicide is legal or illegal?'] == 'legal'
             models.SurveyResponse.objects.create(
                 user=user,
                 answer=a_suicide_0 if r_suicide else a_suicide_1,
