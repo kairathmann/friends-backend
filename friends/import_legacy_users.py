@@ -1,4 +1,3 @@
-from datetime import datetime
 from dateutil import parser
 from . import models
 import csv
@@ -6,20 +5,6 @@ import pytz
 
 
 def import_legacy_users():
-
-    # rounds
-
-    round1 = models.Round.objects.create(
-        id=1,
-        start_timestamp=pytz.UTC.localize(datetime(2018, 12, 3, 0, 0, 0, 0)),
-        end_timestamp=pytz.UTC.localize(datetime(2018, 12, 9, 23, 59, 59, 999999)),
-    )
-
-    round2 = models.Round.objects.create(
-        id=2,
-        start_timestamp=pytz.UTC.localize(datetime(2018, 12, 27, 0, 0, 0, 0)),
-        end_timestamp=pytz.UTC.localize(datetime(2019, 1, 13, 23, 59, 59, 999999)),
-    )
 
     # questions and answers
 

@@ -14,20 +14,11 @@ class TestCaseWithData(TestCase):
 
     def tearDown(self):
         models.Chat.objects.all().delete()
-        models.Round.objects.all().delete()
         models.LunaUser.objects.all().delete()
         models.SurveyQuestion.objects.all().delete()
         models.SurveyAnswer.objects.all().delete()
         models.SurveyResponse.objects.all().delete()
         models.Color.objects.all().delete()
-
-    def addRounds(self):
-        self.round1 = models.Round.objects.create(
-            description='description1',
-        )
-        self.round2 = models.Round.objects.create(
-            description='description2',
-        )
 
     def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(

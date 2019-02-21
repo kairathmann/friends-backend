@@ -163,23 +163,6 @@ class FreeTextResponse(models.Model):
     timestamp = models.DateTimeField(default=timezone.now, db_index=True, editable=False)
 
 
-class Round(models.Model):
-    """
-    A Round is one iteration of an experiment pairing users with one another.
-    """
-
-    start_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
-
-    end_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
-
-    description = models.TextField(blank=True)
-
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='rounds', blank=True)
-
-    class Meta:
-        ordering = ['start_timestamp', ]
-
-
 CHAT_TYPE_FREE = 1
 CHAT_TYPE_TEXT = 2
 CHAT_TYPE_LONGTEXT = 3
@@ -198,7 +181,8 @@ class Chat(models.Model):
     A chat!
     """
 
-    round = models.ForeignKey(Round, null=True, on_delete=models.DO_NOTHING)
+    # 1 for the current match chat, None for everything else
+    round = models.PositiveSmallIntegerField(null=True)
 
     # The type that was initially set for this chat during a Round, if applicable.
     # Only used for data analysis.
