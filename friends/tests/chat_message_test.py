@@ -82,7 +82,7 @@ class ChatMessageTest(TestCaseWithAuthenticatedUser):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'no_text_field')
+        self.assertEqual(response.data, 'text_field_not_found')
 
     def test_post_404_new_message_to_chat_you_are_not_in(self):
         self.addChat((self.user2, self.user3))

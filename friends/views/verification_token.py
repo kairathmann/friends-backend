@@ -1,3 +1,4 @@
+import phonenumbers
 from authy.api import AuthyApiClient
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -8,7 +9,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .. import serializers
-import phonenumbers
+from ..utilities.validation_utility import ValidationUtility
 
 
 authy_api = AuthyApiClient(settings.AUTHY_ACCOUNT_SECURITY_API_KEY)
@@ -25,9 +26,15 @@ class VerificationToken(APIView):
         :return:
         """
 
-        phone_number = request.data.get('phone_number')
-        country_code = request.data.get('country_code')
-        token = request.data.get('token')
+        phone_number, error_response = ValidationUtility().validate_data_object(request.data, 'phone_number', str)
+        if error_response:
+            return error_response
+        country_code, error_response = ValidationUtility().validate_data_object(request.data, 'country_code', str)
+        if error_response:
+            return error_response
+        token, error_response = ValidationUtility().validate_data_object(request.data, 'token', str)
+        if error_response:
+            return error_response
 
         # Validate
         if not country_code.startswith('+'):

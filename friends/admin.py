@@ -4,13 +4,7 @@ from rest_framework.authtoken.models import Token
 from . import models
 
 
-class RoundAdmin(admin.ModelAdmin):
-    model = models.Round
-    exclude = ('users', )
-
-
 # Register
-admin.site.register(models.Round, RoundAdmin)
 
 # Unregister
 admin.autodiscover()

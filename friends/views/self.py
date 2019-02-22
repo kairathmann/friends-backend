@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .. import models
 from .. import serializers
+from ..utilities.validation_utility import ValidationUtility
 
 
 class Self(APIView):
@@ -13,20 +14,19 @@ class Self(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
-        city = request.data.get('city')
-        first_name = request.data.get('first_name')
-        color = request.data.get('color')
-        emoji = request.data.get('emoji')
 
-        # Check for None or ''
-        if not city:
-            return Response('city_missing', status=status.HTTP_400_BAD_REQUEST)
-        if not first_name:
-            return Response('first_name_missing', status=status.HTTP_400_BAD_REQUEST)
-        if not color:
-            return Response('color_missing', status=status.HTTP_400_BAD_REQUEST)
-        if not emoji:
-            return Response('emoji_missing', status=status.HTTP_400_BAD_REQUEST)
+        city, error_response = ValidationUtility().validate_data_object(request.data, 'city', str)
+        if error_response:
+            return error_response
+        first_name, error_response = ValidationUtility().validate_data_object(request.data, 'first_name', str)
+        if error_response:
+            return error_response
+        color, error_response = ValidationUtility().validate_data_object(request.data, 'color', str)
+        if error_response:
+            return error_response
+        emoji, error_response = ValidationUtility().validate_data_object(request.data, 'emoji', str)
+        if error_response:
+            return error_response
 
         color_instance = None
         try:

@@ -39,7 +39,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'answer_ids_invalid')
+        self.assertEqual(response.data, 'answer_ids_field_not_found')
         self.assertEqual(models.SurveyResponse.objects.count(), 2)
 
     def test_post_400_answer_ids_invalid(self):
@@ -52,7 +52,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'answer_ids_invalid')
+        self.assertEqual(response.data, 'answer_ids_invalid') # changed
         self.assertEqual(models.SurveyResponse.objects.count(), 2)
 
     def test_post_400_second_answer_id_invalid(self):
@@ -65,7 +65,7 @@ class ResponsesTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'answer_ids_invalid')
+        self.assertEqual(response.data, 'answer_ids_invalid') # changed
         self.assertEqual(models.SurveyResponse.objects.count(), 2)
 
     def test_post_400_answer_ids_unknown(self):

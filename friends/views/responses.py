@@ -5,16 +5,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .. import models
 from .. import serializers
+from ..utilities.validation_utility import ValidationUtility
 
 
 class Responses(APIView):
 
     def post(self, request):
-        answer_ids = request.data.get('answer_ids')
-
-        # Validate
-        if not isinstance(answer_ids, list):
-            return Response('answer_ids_invalid', status=status.HTTP_400_BAD_REQUEST)
+        answer_ids, error_response = ValidationUtility().validate_data_object(request.data, "answer_ids", list)
+        if error_response:
+            return error_response
 
         responses = []
 

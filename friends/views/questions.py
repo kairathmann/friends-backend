@@ -10,11 +10,19 @@ class Questions(APIView):
     def get(self, request):
         user = request.user
 
+        questions = models.SurveyQuestion.objects
+
         # Only include questions that haven't been answered by the user yet
-        questions = models.SurveyQuestion.objects.exclude(answers__responses__user=user).distinct()
+        questions = questions.exclude(answers__responses__user=user).distinct()
+
+        # Exclude legacy questions
+        questions = questions.exclude(is_enabled=False)
 
         # Exclude multiresponse questions
         questions = questions.filter(max_answers=1)
+
+        # Shuffle
+        questions = questions.order_by('?')
 
         serializer = serializers.SurveyQuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

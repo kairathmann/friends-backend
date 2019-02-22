@@ -5,27 +5,39 @@ from .. import models
 
 class TestCaseWithData(TestCase):
     def setUp(self):
-        # Remove colors that are inserted by default (8 basic ones)
+        # Remove users (i.e. Brian Bot) that are inserted by default
+        models.LunaUser.objects.all().delete()
+
+        # Remove colors that are inserted by default
         models.Color.objects.all().delete()
         models.Color.objects.create(id=1, hex_value='AABBCC')
         models.Color.objects.create(id=2, hex_value='ABABAB')
+        models.Color.objects.create(id=3, hex_value='623694', brian_bot=True)
+
+        # Remove questions that are inserted by default
+        models.SurveyQuestion.objects.all().delete()
 
     def tearDown(self):
         models.Chat.objects.all().delete()
-        models.Round.objects.all().delete()
         models.LunaUser.objects.all().delete()
         models.SurveyQuestion.objects.all().delete()
         models.SurveyAnswer.objects.all().delete()
         models.SurveyResponse.objects.all().delete()
         models.Color.objects.all().delete()
 
-    def addRounds(self):
-        self.round1 = models.Round.objects.create(
-            description='description1',
+    def addBrianBot(self):
+        brian_bot_color = models.Color.objects.get(brian_bot=True)
+
+        self.brianBot = models.LunaUser.objects.create_user(
+            username='Brian-Bot',
+            city='Luminos',
+            emoji='⭐',
+            color=brian_bot_color,
+            is_staff=True,
         )
-        self.round2 = models.Round.objects.create(
-            description='description2',
-        )
+
+    def removeBrianBot(self):
+        models.LunaUser.objects.get(is_staff=True).delete()
 
     def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(
@@ -103,6 +115,18 @@ class TestCaseWithData(TestCase):
             emoji='🤠',
             password='test')
 
+    def addOneUser(self):
+        self.user4 = models.LunaUser.objects.create_user(
+            username='test4',
+            city='test-city',
+            first_name='Fourth',
+            email='test4@example.com',
+            color=models.Color.objects.get(id=2),
+            emoji='🤠',
+            password='test')
+        self.token4 = Token.objects.get(user=self.user4).key
+        self.header4 = {'HTTP_AUTHORIZATION': "Bearer {}".format(self.token4)}
+
     def addLegacyUsers(self):
         self.legacy_user = models.LunaUser.objects.create_user(
             username='legacy@example.com')
@@ -122,6 +146,9 @@ class TestCaseWithData(TestCase):
         self.chat1.save()
         for u in users:
             models.ChatUsers.objects.create(chat=self.chat1, user=u)
+
+    def removeChats(self):
+        models.Chat.objects.all().delete()
 
     def addMessage(self):
         self.message = models.Message.objects.create(

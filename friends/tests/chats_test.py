@@ -1,12 +1,12 @@
-import datetime
-
 from django.urls import reverse_lazy
 from .test_case_with_authenticated_user import TestCaseWithAuthenticatedUser
+
 
 class ChatsTest(TestCaseWithAuthenticatedUser):
     def setUp(self):
         super(ChatsTest, self).setUp()
         self.addMoreUsers()
+        self.removeChats()
 
     def view(self):
         return 'chats'
@@ -114,31 +114,8 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(0, len(response.data))
 
-    def test_chat_for_expired_round(self):
-        self.addRounds()
-        self.addChat([self.user, self.user2], self.round1)
-        self.round1.users.add(self.user)
-        self.round1.start_timestamp += datetime.timedelta(days=-1)
-        self.round1.end_timestamp += datetime.timedelta(days=-1)
-        self.round1.save()
-
-        response = self.client.get(
-            reverse_lazy(self.view()),
-            content_type='application/json',
-            **self.header,
-        )
-
-        self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(1, len(response.data))
-
     def test_no_chat_for_current_round(self):
-        self.addRounds()
-        self.addChat([self.user, self.user2], self.round1)
-        self.round1.users.add(self.user)
-        self.round1.start_timestamp += datetime.timedelta(days=-1)
-        self.round1.end_timestamp += datetime.timedelta(days=+1)
-        self.round1.save()
+        self.addChat([self.user, self.user2], 1)
 
         response = self.client.get(
             reverse_lazy(self.view()),
@@ -149,3 +126,21 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(0, len(response.data))
+
+    # TODO Re-add tests when dogfooding via pairing everyone with everyone has concluded.
+    # def test_chat_with_brian_bot_created_for_user(self):
+    #     self.addOneUser()
+    #
+    #     response = self.client.get(
+    #         reverse_lazy(self.view()),
+    #         content_type='application/json',
+    #         **self.header4,
+    #     )
+    #
+    #     chat_user_set = response.data[0].get('chatusers_set')
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #
+    #     self.assertEqual(1, len(response.data))
+    #     self.assertEqual(chat_user_set[0]['user']['id'], self.brianBot.id)
+    #     self.assertEqual(chat_user_set[1]['user']['id'], self.user4.id)

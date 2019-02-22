@@ -1,9 +1,11 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
+from .utilities.chat_utils import ChatUtils
 
 CITY_MAX_LENGTH = 35
 
@@ -41,9 +43,9 @@ EMOJI_MAX_LENGTH = 4
 class Color(models.Model):
     """
     A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
-    Colors are limited to 8 choices.
     """
     hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
+    brian_bot = models.BooleanField(default=False) # For the special Brian Bot color (not available to other users)
 
 
 class LunaUser(AbstractUser):
@@ -105,10 +107,12 @@ class SurveyQuestion(models.Model):
     referencing it.
     """
 
-    text = models.CharField(max_length=SURVEY_QUESTION_TEXT_MAX_LENGTH)
+    text = models.CharField(max_length=SURVEY_QUESTION_TEXT_MAX_LENGTH, unique=True)
 
     # The maximum number of answers a user may select for this question.
     max_answers = models.PositiveSmallIntegerField(default=1)
+
+    is_enabled = models.BooleanField(default=True)
 
 
 class SurveyAnswer(models.Model):
@@ -144,7 +148,7 @@ class FreeTextQuestion(models.Model):
     A FreeTextQuestion is a question allowing a user to type a free text answer.
     """
 
-    text = models.CharField(max_length=FREE_TEXT_QUESTION_MAX_LENGTH)
+    text = models.CharField(max_length=FREE_TEXT_QUESTION_MAX_LENGTH, unique=True)
 
 
 class FreeTextResponse(models.Model):
@@ -154,26 +158,11 @@ class FreeTextResponse(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    question = models.ForeignKey(FreeTextQuestion, related_name='responses', on_delete=models.CASCADE)
+
     text = models.TextField()
 
     timestamp = models.DateTimeField(default=timezone.now, db_index=True, editable=False)
-
-
-class Round(models.Model):
-    """
-    A Round is one iteration of an experiment pairing users with one another.
-    """
-
-    start_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
-
-    end_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
-
-    description = models.TextField(blank=True)
-
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='rounds', blank=True)
-
-    class Meta:
-        ordering = ['start_timestamp', ]
 
 
 CHAT_TYPE_FREE = 1
@@ -194,7 +183,8 @@ class Chat(models.Model):
     A chat!
     """
 
-    round = models.ForeignKey(Round, null=True, on_delete=models.DO_NOTHING)
+    # 1 for the current match chat, None for everything else
+    round = models.PositiveSmallIntegerField(null=True)
 
     # The type that was initially set for this chat during a Round, if applicable.
     # Only used for data analysis.
@@ -225,3 +215,15 @@ class ChatUsers(models.Model):
 
     class Meta:
         unique_together = ('chat', 'user')
+
+
+@receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
+def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
+    if created and not instance.is_staff:
+        brian_bot_color = Color.objects.get(brian_bot=True)
+        brian_bot = LunaUser.objects.get(is_staff=True, color=brian_bot_color)
+        ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
+
+        # For dogfooding chat inside Luna, we also create chats with all other users.
+        for user in get_user_model().objects.exclude(is_staff=True).exclude(id=instance.id):
+            ChatUtils.create_chat([instance, user], 'This is a chat with a human.')
