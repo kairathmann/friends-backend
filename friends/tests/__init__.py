@@ -1,4 +1,5 @@
 from .chat_message_test import ChatMessageTest
+from .chat_utils_test import ChatUtilsTest
 from .chats_in_round_test import ChatsInRoundTest
 from .chats_test import ChatsTest
 from .colors_test import ColorsTest
@@ -10,6 +11,7 @@ from .verification_token_test import VerificationTokenTest
 
 __all__ = [
     ChatMessageTest,
+    ChatUtilsTest,
     ChatsTest,
     ChatsInRoundTest,
     ColorsTest,
