@@ -163,3 +163,13 @@ class TestCaseWithData(TestCase):
             sender=self.user,
             text="Hello World Again!",
         )
+
+    def addFiveMessages(self):
+        return [
+            models.Message.objects.create(
+                chat=self.chat1,
+                sender=self.user,
+                text="Message %d"%i,
+            )
+            for i in range(5)
+        ]

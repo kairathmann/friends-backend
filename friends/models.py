@@ -204,6 +204,9 @@ class Message(models.Model):
 
     timestamp = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        ordering = ('-id',)
+
 
 class ChatUsers(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)

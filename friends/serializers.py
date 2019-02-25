@@ -122,7 +122,20 @@ class ChatUsersSerializer(serializers.ModelSerializer):
 
 
 class ChatDetailSerializer(serializers.ModelSerializer):
-    messages = MessageSerializer(many=True)
+    messages = serializers.SerializerMethodField()
+    def get_messages(self, chat):
+        chat_messages = chat.messages
+
+        from_message = self.context.get('from_message')
+        if from_message:
+            chat_messages = chat_messages.filter(id__lt=from_message)
+
+        limit = self.context.get('limit')
+        if limit:
+            chat_messages = chat_messages.all()[:limit]
+
+        return MessageSerializer(chat_messages, many=True).data
+
     chatusers_set = ChatUsersSerializer(many=True)
 
     class Meta:
@@ -141,7 +154,7 @@ class ChatOverviewSerializer(serializers.ModelSerializer):
 
     last_message = serializers.SerializerMethodField()
     def get_last_message(self, chat):
-        return MessageSerializer(chat.messages.last()).data
+        return MessageSerializer(chat.messages.first()).data
 
     unread_messages = serializers.SerializerMethodField()
     def get_unread_messages(self, chat):
