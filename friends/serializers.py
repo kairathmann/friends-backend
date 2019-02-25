@@ -84,8 +84,8 @@ class SurveyAnsweredQuestionSerializer(serializers.ModelSerializer):
 
     def get_last_answer_id(self, obj):
         response = models.SurveyResponse.objects \
-            .filter(answer__question=obj, user_id=self.context.get('request').user.id) \
-            .latest('timestamp')
+            .filter(answer__question=obj, user_id=self.context.get('user').id) \
+            .last()
         return response.answer_id
 
 

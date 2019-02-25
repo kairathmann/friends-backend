@@ -17,6 +17,7 @@ class QuestionsAnsweredTest(TestCaseWithAuthenticatedUser):
             **self.header
         )
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
         self.assertIn({
             'id': self.question2.id,
             'text': self.question2.text,

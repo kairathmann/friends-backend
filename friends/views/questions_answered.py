@@ -1,3 +1,5 @@
+import random
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,7 +24,8 @@ class QuestionsAnswered(APIView):
         questions = questions.filter(max_answers=1)
 
         # Shuffle
-        questions = questions.order_by('?')
+        questions = questions[::1]
+        random.shuffle(questions)
 
-        serializer = serializers.SurveyAnsweredQuestionSerializer(questions, many=True, context={'request': request})
+        serializer = serializers.SurveyAnsweredQuestionSerializer(questions, many=True, context={'user': request.user})
         return Response(serializer.data, status=status.HTTP_200_OK)
