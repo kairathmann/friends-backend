@@ -24,6 +24,7 @@ class NotificationService:
             "summary_arg": message.sender.first_name,
             "data": {
                 "chat_type": message.chat.type,
+                "round_id": message.chat.round,
                 "chat_id": message.chat.id,
                 "message_id": message.id,
                 "message_sender": LunaUserPartnerSerializer(message.sender).data,
