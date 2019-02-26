@@ -130,8 +130,12 @@ class ChatDetailSerializer(serializers.ModelSerializer):
         if from_message:
             chat_messages = chat_messages.filter(id__lt=from_message)
 
+        until_message = self.context.get('until_message')
+        if until_message:
+            chat_messages = chat_messages.filter(id__gt=until_message)
+
         limit = self.context.get('limit')
-        if limit:
+        if limit and not until_message: # until_message overrides limit
             chat_messages = chat_messages.all()[:limit]
 
         return MessageSerializer(chat_messages, many=True).data

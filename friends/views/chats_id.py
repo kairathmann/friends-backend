@@ -16,27 +16,22 @@ class ChatsId(APIView):
         chat_id = kwargs['id']
         user = request.user
 
-        limit = request.GET.get('limit')
-        if limit:
-            try:
-                limit = int(limit)
-            except ValueError:
-                return Response('invalid_message_limit', status=status.HTTP_400_BAD_REQUEST)
-            if limit <= 0:
-                return Response('invalid_message_limit', status=status.HTTP_400_BAD_REQUEST)
-        else:
+        limit, error_response = self.validate_query_param(request, 'limit')
+        if error_response:
+            return error_response
+        if not limit:
             limit = DEFAULT_MAX_MESSAGE_LIMIT
 
-        from_message = request.GET.get('from_message')
-        if from_message:
-            try:
-                from_message = int(from_message)
-            except ValueError:
-                return Response('invalid_from_message', status=status.HTTP_400_BAD_REQUEST)
-            if from_message <= 0:
-                return Response('invalid_from_message', status=status.HTTP_400_BAD_REQUEST)
+        from_message, error_response = self.validate_query_param(request, 'from_message')
+        if error_response:
+            return error_response
+
+        until_message, error_response = self.validate_query_param(request, 'until_message')
+        if error_response:
+            return error_response
 
         chat = get_object_or_404(models.Chat, pk=chat_id, chatusers__user=user)
+
         #Does the message with id from_message even belong to this chat?
         if from_message:
             try:
@@ -44,8 +39,21 @@ class ChatsId(APIView):
             except models.Message.DoesNotExist:
                 return Response('invalid_from_message', status=status.HTTP_400_BAD_REQUEST)
 
+        #Does the message with id until_message even belong to this chat?
+        if until_message:
+            try:
+                chat.messages.get(pk=until_message)
+            except models.Message.DoesNotExist:
+                return Response('invalid_until_message', status=status.HTTP_400_BAD_REQUEST)
+
+        #Does the chronology of from now until then even make sense here?
+        if from_message and until_message:
+            if from_message <= until_message:
+                return Response('invalid_until_message', status=status.HTTP_400_BAD_REQUEST)
+
+
         # serialize chat before updating chat_unread_status in db
-        serializer = serializers.ChatDetailSerializer(chat, context={'limit': limit, 'from_message': from_message})
+        serializer = serializers.ChatDetailSerializer(chat, context={'limit': limit, 'from_message': from_message, 'until_message': until_message})
         serializer_data = serializer.data
 
         # update chatusers.last_read in the db
@@ -53,6 +61,17 @@ class ChatsId(APIView):
         MessageService(chat, user, most_recent_message).on_message_read()
 
         return Response(serializer_data, status=status.HTTP_200_OK)
+
+    def validate_query_param(self, request, param_name):
+        value = request.GET.get(param_name)
+        if value:
+            try:
+                value = int(value)
+            except ValueError:
+                return None, Response(f'invalid_{param_name}', status=status.HTTP_400_BAD_REQUEST)
+            if value <= 0:
+                return None, Response(f'invalid_{param_name}', status=status.HTTP_400_BAD_REQUEST)
+        return value, None
 
     def post(self, request, **kwargs):
         chat_id = kwargs['id']
