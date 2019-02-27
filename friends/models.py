@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from .utilities.chat_utils import ChatUtils
+from .utilities.user_utils import UserUtils
 
 CITY_MAX_LENGTH = 35
 
@@ -223,10 +224,6 @@ class ChatUsers(models.Model):
 
 @receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
 def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
-    if created and not instance.is_brian_bot:
-        brian_bot = LunaUser.objects.get(is_brian_bot=True)
+    if created and not instance.is_staff:
+        brian_bot = UserUtils.get_brian_bot()
         ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
-
-        # For dogfooding chat inside Luna, we also create chats with all other users.
-        for user in get_user_model().objects.exclude(is_brian_bot=True).exclude(id=instance.id):
-            ChatUtils.create_chat([instance, user], 'This is a chat with a human.')
