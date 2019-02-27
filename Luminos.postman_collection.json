@@ -250,7 +250,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"city\": \"Łaziska\",\n\t\"first_name\": \"bar\",\n\t\"color\": 1,\n\t\"emoji\": \"🙈\"\n}"
+					"raw": "{\n\t\"city\": \"Łaziska\",\n\t\"first_name\": \"bar\",\n\t\"color\": 2,\n\t\"emoji\": \"🙈\"\n}"
 				},
 				"url": {
 					"raw": "{{HOST}}/api/v1/self/",

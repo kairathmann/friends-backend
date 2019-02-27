@@ -56,6 +56,7 @@ class LunaUser(AbstractUser):
     city = models.CharField(max_length=CITY_MAX_LENGTH, db_index=True)
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
     emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
+    is_brian_bot = models.BooleanField(default=False)
 
 
 class LegacyDataSet(models.Model):
@@ -222,11 +223,10 @@ class ChatUsers(models.Model):
 
 @receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
 def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
-    if created and not instance.is_staff:
-        brian_bot_color = Color.objects.get(brian_bot=True)
-        brian_bot = LunaUser.objects.get(is_staff=True, color=brian_bot_color)
+    if created and not instance.is_brian_bot:
+        brian_bot = LunaUser.objects.get(is_brian_bot=True)
         ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
 
         # For dogfooding chat inside Luna, we also create chats with all other users.
-        for user in get_user_model().objects.exclude(is_staff=True).exclude(id=instance.id):
+        for user in get_user_model().objects.exclude(is_brian_bot=True).exclude(id=instance.id):
             ChatUtils.create_chat([instance, user], 'This is a chat with a human.')

@@ -34,10 +34,11 @@ class TestCaseWithData(TestCase):
             emoji='⭐',
             color=brian_bot_color,
             is_staff=True,
+            is_brian_bot=True,
         )
 
     def removeBrianBot(self):
-        models.LunaUser.objects.get(is_staff=True).delete()
+        models.LunaUser.objects.get(is_brian_bot=True).delete()
 
     def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(
@@ -173,3 +174,6 @@ class TestCaseWithData(TestCase):
             )
             for i in range(5)
         ]
+
+    def removeMessages(self):
+        models.Message.objects.all().delete()
