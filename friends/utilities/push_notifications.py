@@ -30,7 +30,7 @@ class NotificationService:
                 "message_sender": LunaUserPartnerSerializer(message.sender).data,
                 "message_recipient": LunaUserPartnerSerializer(recipient).data,
                 "message_text": message.text,
-                "message_timestamp": str(message.timestamp),
+                "message_timestamp": message.timestamp.isoformat()
             }
         }
 
