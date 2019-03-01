@@ -153,25 +153,25 @@ class TestCaseWithData(TestCase):
     def removeChats(self):
         models.Chat.objects.all().delete()
 
-    def addMessage(self):
+    def addMessage(self, sender=None):
         self.message = models.Message.objects.create(
             chat=self.chat1,
-            sender=self.user,
+            sender=sender if sender else self.user,
             text="Hello World!",
         )
 
-    def addSecondMessage(self):
+    def addSecondMessage(self, sender=None):
         self.message2 = models.Message.objects.create(
             chat=self.chat1,
-            sender=self.user,
+            sender=sender if sender else self.user,
             text="Hello World Again!",
         )    
 
-    def addFiveMessages(self):
+    def addFiveMessages(self, sender=None):
         return [
             models.Message.objects.create(
                 chat=self.chat1,
-                sender=self.user,
+                sender=sender if sender else self.user,
                 text="Message %d"%i,
             )
             for i in range(5)

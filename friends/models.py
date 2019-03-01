@@ -219,6 +219,10 @@ class ChatUsers(models.Model):
     # There may be a clever trigger on on_delete to find the next last-read message.
     last_read = models.ForeignKey(Message, null=True, on_delete=models.SET_NULL)
 
+    # This flag set to True on when we have requested the user to give us feedback about the chat partner, and cleared
+    # back to False when the user has given feedback.
+    feedback_requested = models.BooleanField(default=False)
+
     class Meta:
         unique_together = ('chat', 'user')
 

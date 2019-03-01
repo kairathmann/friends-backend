@@ -6,8 +6,26 @@ from ..serializers import LunaUserPartnerSerializer
 
 
 class NotificationService:
+    def dispatch_notification(self, notification_body):
+        """
+        Calls OneSignal API to send push notification to recipient
+        """
+        try:
+            response = requests.post(
+                base.ONESIGNAL_API_ENDPOINT,
+                headers={
+                    "Authorization": base.ONESIGNAL_AUTHORIZATION_HEADER,
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                json=notification_body,
+            )
+        except requests.exceptions.RequestException as exc:
+            logging.log(logging.WARNING, f'failed to send a notification: {exc}')
 
-    def build_notification_body(self, message, recipient):
+        return response
+
+
+    def build_new_message_notification_body(self, message, recipient):
         return {
             "app_id": base.ONESIGNAL_APPID,
             "headings": {
@@ -34,25 +52,36 @@ class NotificationService:
             }
         }
 
-    def dispatch_notification(self, message, recipient):
-        """
-        Calls OneSignal API to send push notification to recipient
-        """
 
+    def dispatch_new_message_notification(self, message, recipient):
         if base.ONESIGNAL_DISABLE == "1":
             return
 
-        message_body = self.build_notification_body(message, recipient)
+        notification_body = self.build_new_message_notification_body(message, recipient)
+        return self.dispatch_notification(notification_body)
 
-        try:
-            response = requests.post(
-                base.ONESIGNAL_API_ENDPOINT,
-                headers={
-                    "Authorization": base.ONESIGNAL_AUTHORIZATION_HEADER,
-                    "Content-Type": "application/json; charset=utf-8"
-                },
-                json=message_body,
-            )
-        except requests.exceptions.RequestException as exc:
-            logging.log(logging.WARNING, f'failed to send a notification: {exc}')
 
+    def build_feedback_request_notification_body(self, chat, recipient):
+        return {
+            "app_id": base.ONESIGNAL_APPID,
+            "headings": {
+                "en": 'I CAN HAZ FEEDBACK' #TODO
+            },
+            "include_external_user_ids": [str(recipient.id)],
+            "contents": {
+                "en": 'FOR REALZ, I CAN HAZ FEEDBACK???!?',
+            },
+            "isEmail": False,
+            "thread_id": chat.id,
+            "data": {
+                "chat_id": chat.id,
+            }
+        }
+
+
+    def dispatch_feedback_request_notification(self, chat, recipient):
+        if base.ONESIGNAL_DISABLE == "1":
+            return
+
+        notification_body = self.build_feedback_request_notification_body(chat, recipient)
+        return self.dispatch_notification(notification_body)

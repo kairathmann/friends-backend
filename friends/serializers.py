@@ -118,6 +118,7 @@ class ChatUsersSerializer(serializers.ModelSerializer):
         fields = [
             'user',
             'last_read',
+            'feedback_requested'
         ]
 
 
