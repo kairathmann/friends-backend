@@ -470,12 +470,6 @@ def import_legacy_users():
                 submitted_at=submitted_at,
                 token=token,
             )
-            if entry_round == 1:
-                round1.users.add(user)
-
-            # Simplification: Every user from round 1 is also assigned to round 2.
-            if entry_round >= 1:
-                round2.users.add(user)
 
             # Question data
 

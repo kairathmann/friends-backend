@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('friends', '0014_merge_20190225_1607'),
+        ('friends', '0015_feedback_response_validations'),
     ]
 
     operations = [
