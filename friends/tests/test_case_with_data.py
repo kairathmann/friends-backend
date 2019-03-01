@@ -24,6 +24,8 @@ class TestCaseWithData(TestCase):
         models.SurveyAnswer.objects.all().delete()
         models.SurveyResponse.objects.all().delete()
         models.Color.objects.all().delete()
+        models.FeedbackQuestion.objects.all().delete()
+        models.FeedbackResponse.objects.all().delete()
 
     def addBrianBot(self):
         brian_bot_color = models.Color.objects.get(brian_bot=True)
@@ -163,7 +165,7 @@ class TestCaseWithData(TestCase):
             chat=self.chat1,
             sender=self.user,
             text="Hello World Again!",
-        )
+        )    
 
     def addFiveMessages(self):
         return [
@@ -177,3 +179,20 @@ class TestCaseWithData(TestCase):
 
     def removeMessages(self):
         models.Message.objects.all().delete()
+
+    def addFeedbackQuestions(self):
+        self.mandatory_feedback_question1 = models.FeedbackQuestion.objects.create(
+            text='Feedback question: rating response 1',
+            order_index=1,
+            type=models.FEEDBACK_TYPE_RATING,
+        )
+        self.mandatory_feedback_question2 = models.FeedbackQuestion.objects.create(
+            text='Feedback question: rating response 2',
+            order_index=2,
+            type=models.FEEDBACK_TYPE_RATING,
+        )
+        self.optional_feedback_question1 = models.FeedbackQuestion.objects.create(
+            text='Feedback question: text response',
+            order_index=3,
+            type=models.FEEDBACK_TYPE_TEXT,
+        )

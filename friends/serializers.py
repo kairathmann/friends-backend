@@ -184,3 +184,24 @@ class ChatOverviewSerializer(serializers.ModelSerializer):
         ]
 
 
+class FeedbackQuestionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.FeedbackQuestion
+        fields = [
+            'text',
+            'order_index',
+            'type',
+        ]
+
+
+class FeedbackResponseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.FeedbackResponse
+        fields = [
+            'question',
+            'chat_user',
+            'rating_response',
+            'text_response',
+        ]

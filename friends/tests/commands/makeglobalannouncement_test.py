@@ -1,6 +1,6 @@
 from django.core.management import call_command
-from .test_case_with_authenticated_user import TestCaseWithAuthenticatedUser
-from .. import models
+from ..test_case_with_authenticated_user import TestCaseWithAuthenticatedUser
+from friends import models
 
 class MakeGlobalAnnouncementTest(TestCaseWithAuthenticatedUser):
 
@@ -23,7 +23,7 @@ class MakeGlobalAnnouncementTest(TestCaseWithAuthenticatedUser):
         for message in models.Message.objects.all():
             recipient_chat_user = models.ChatUsers.objects.filter(chat=message.chat).exclude(user=message.sender).first()
             recipient = recipient_chat_user.user
-            self.assertEqual(message.text, 'global announcement text for {recipient.first_name}')
+            self.assertEqual(message.text, f'global announcement text for {recipient.first_name}')
 
     def test_global_announcement_with_empty_string(self):
         call_command('makeglobalannouncement', '', '--test')

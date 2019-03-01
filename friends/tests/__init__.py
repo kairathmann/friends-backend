@@ -4,6 +4,8 @@ from .chats_in_round_test import ChatsInRoundTest
 from .chats_test import ChatsTest
 from .colors_test import ColorsTest
 from .legacy_test import LegacyTest
+from .feedback_questions_test import FeedbackQuestionsTest
+from .feedback_responses_test import FeedbackResponsesTest
 from .questions_test import QuestionsTest
 from .questions_answered_test import QuestionsAnsweredTest
 from .responses_test import ResponsesTest
@@ -17,6 +19,8 @@ __all__ = [
     ChatsInRoundTest,
     ColorsTest,
     LegacyTest,
+    FeedbackQuestionsTest,
+    FeedbackResponsesTest,
     QuestionsTest,
     QuestionsAnsweredTest,
     ResponsesTest,

@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator
 from rest_framework.authtoken.models import Token
 from .utilities.chat_utils import ChatUtils
 from .utilities.user_utils import UserUtils
@@ -227,3 +228,45 @@ def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
     if created and not instance.is_staff:
         brian_bot = UserUtils.get_brian_bot()
         ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
+
+
+FEEDBACK_QUESTION_TEXT_MAX_LENGTH = 255
+FEEDBACK_TYPE_RATING = 1
+FEEDBACK_TYPE_TEXT = 2
+
+FEEDBACK_TYPES = (
+    (FEEDBACK_TYPE_RATING, "Rating"),
+    (FEEDBACK_TYPE_TEXT, "Text"),
+)
+
+MIN_FEEDBACK_RATING = 1
+MAX_FEEDBACK_RATING = 5
+
+class FeedbackQuestion(models.Model):
+    text = models.CharField(max_length=FEEDBACK_QUESTION_TEXT_MAX_LENGTH, unique=True)
+
+    order_index = models.PositiveSmallIntegerField(db_index=True, unique=True)
+
+    type = models.PositiveSmallIntegerField(choices=FEEDBACK_TYPES)
+
+    is_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order_index', ]
+
+    def __str__(self):
+        return self.text
+
+
+class FeedbackResponse(models.Model):
+    question = models.ForeignKey(FeedbackQuestion, related_name='feedback_responses', on_delete=models.CASCADE)
+
+    chat_user = models.ForeignKey(ChatUsers, null=True, blank=True, on_delete=models.SET_NULL)
+
+    rating_response = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(MIN_FEEDBACK_RATING), MaxValueValidator(MAX_FEEDBACK_RATING)]
+    )
+
+    text_response = models.TextField(null=True, blank=True)

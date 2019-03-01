@@ -10,6 +10,8 @@ from .verification import Verification
 from .verification_token import VerificationToken
 from .colors import Colors
 from .questions_answered import QuestionsAnswered
+from .feedback_questions import FeedbackQuestions
+from .feedback_responses import FeedbackResponses
 
 __all__ = [
     ChatsId,
@@ -23,5 +25,7 @@ __all__ = [
     RoundsSubscribe,
     Self,
     Verification,
-    VerificationToken
+    VerificationToken,
+    FeedbackQuestions,
+    FeedbackResponses,
 ]
