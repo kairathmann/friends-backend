@@ -40,6 +40,8 @@ class NotificationService:
             "android_group_message": {"en": "You have $[notif_count] new messages from {0}".format(message.sender.first_name)},
             "thread_id": message.chat.id,
             "summary_arg": message.sender.first_name,
+            "ios_badgeType": "Increase",
+            "ios_badgeCount": 1,
             "data": {
                 "chat_type": message.chat.type,
                 "round_id": message.chat.round,
