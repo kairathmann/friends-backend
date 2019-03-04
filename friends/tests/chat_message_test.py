@@ -37,7 +37,7 @@ class ChatMessageTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data.get('messages')), 5)
         for i in range(5):
-            self.assertEqual(response.data.get('messages')[i]['text'], 'Message %d'%(4-i))
+            self.assertEqual(response.data.get('messages')[i]['text'], 'Message %d'%(i))
 
     def test_unread_status_updates_after_get(self):
         self.addMessage()
@@ -179,9 +179,9 @@ class ChatMessageTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data.get('messages')), 3)
-        self.assertEqual(response.data.get('messages')[0]['text'], 'Message 3')
+        self.assertEqual(response.data.get('messages')[0]['text'], 'Message 1')
         self.assertEqual(response.data.get('messages')[1]['text'], 'Message 2')
-        self.assertEqual(response.data.get('messages')[2]['text'], 'Message 1')
+        self.assertEqual(response.data.get('messages')[2]['text'], 'Message 3')
 
     def test_get_from_invalid_message_HTTP400(self):
         self.addFiveMessages()

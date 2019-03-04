@@ -136,9 +136,11 @@ class ChatDetailSerializer(serializers.ModelSerializer):
         if until_message:
             chat_messages = chat_messages.filter(id__gt=until_message)
 
+        chat_messages = chat_messages.reverse()
         limit = self.context.get('limit')
         if limit and not until_message: # until_message overrides limit
-            chat_messages = chat_messages.all()[:limit]
+            if chat_messages.count() > limit:
+                chat_messages = chat_messages.all()[chat_messages.count()-limit:]
 
         return MessageSerializer(chat_messages, many=True).data
 
