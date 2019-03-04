@@ -31,7 +31,7 @@ class NotificationService:
             "headings": {
                 "en": message.sender.first_name,
             },
-            "include_external_user_ids": [str(recipient.id)],
+            "include_external_user_ids": [str(recipient.notification_id)],
             "contents": {
                 "en": message.text,
             },
@@ -67,7 +67,7 @@ class NotificationService:
             "headings": {
                 "en": 'I CAN HAZ FEEDBACK' #TODO
             },
-            "include_external_user_ids": [str(recipient.id)],
+            "include_external_user_ids": [str(recipient.notification_id)],
             "contents": {
                 "en": 'FOR REALZ, I CAN HAZ FEEDBACK???!?',
             },

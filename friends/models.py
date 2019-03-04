@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 from rest_framework.authtoken.models import Token
+import uuid
 from .utilities.chat_utils import ChatUtils
 from .utilities.user_utils import UserUtils
 
@@ -59,6 +60,7 @@ class LunaUser(AbstractUser):
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
     emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
     is_brian_bot = models.BooleanField(default=False)
+    notification_id=models.UUIDField(null=False, default=uuid.uuid4, unique=True)
 
 
 class LegacyDataSet(models.Model):

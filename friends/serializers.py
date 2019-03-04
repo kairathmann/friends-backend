@@ -27,6 +27,7 @@ class LunaUserSerializer(serializers.ModelSerializer):
             'username',
             'color',
             'emoji',
+            'notification_id'
         ]
 
 
