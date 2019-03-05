@@ -26,6 +26,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data.get('color').get('id'), 2)
         self.assertEqual(response.data.get('color').get('hex_value'), 'ABABAB')
         self.assertEqual(response.data.get('emoji'), '🤠')
+        self.assertTrue(len(response.data.get('notification_id')) > 0)
 
     def test_put_401(self):
         response = self.client.put(
@@ -117,6 +118,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data.get('color').get('id'), 1)
         self.assertEqual(response.data.get('color').get('hex_value'), 'AABBCC')
         self.assertEqual(response.data.get('emoji'), '😪')
+        self.assertTrue(len(response.data.get('notification_id')) > 0)
 
     def test_get_401(self):
         response = self.client.get(

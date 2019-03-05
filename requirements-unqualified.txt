@@ -2,5 +2,6 @@ authy
 awsebcli
 Django
 djangorestframework
+django-extensions
 phonenumbers
 psycopg2-binary

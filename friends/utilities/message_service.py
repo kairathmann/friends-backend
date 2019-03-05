@@ -22,5 +22,5 @@ class MessageService:
 
     def notify_all_users(self):
         for chatuser in self.chat.chatusers_set.all():
-            if chatuser.id != self.user.id:
-                NotificationService().dispatch_notification(self.message, chatuser.user)
+            if chatuser.user.id != self.user.id:
+                NotificationService().dispatch_new_message_notification(self.message, chatuser.user)

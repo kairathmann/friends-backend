@@ -24,6 +24,8 @@ class TestCaseWithData(TestCase):
         models.SurveyAnswer.objects.all().delete()
         models.SurveyResponse.objects.all().delete()
         models.Color.objects.all().delete()
+        models.FeedbackQuestion.objects.all().delete()
+        models.FeedbackResponse.objects.all().delete()
 
     def addBrianBot(self):
         brian_bot_color = models.Color.objects.get(brian_bot=True)
@@ -34,10 +36,11 @@ class TestCaseWithData(TestCase):
             emoji='⭐',
             color=brian_bot_color,
             is_staff=True,
+            is_brian_bot=True,
         )
 
     def removeBrianBot(self):
-        models.LunaUser.objects.get(is_staff=True).delete()
+        models.LunaUser.objects.get(is_brian_bot=True).delete()
 
     def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(
@@ -150,16 +153,46 @@ class TestCaseWithData(TestCase):
     def removeChats(self):
         models.Chat.objects.all().delete()
 
-    def addMessage(self):
+    def addMessage(self, sender=None):
         self.message = models.Message.objects.create(
             chat=self.chat1,
-            sender=self.user,
+            sender=sender if sender else self.user,
             text="Hello World!",
         )
 
-    def addSecondMessage(self):
+    def addSecondMessage(self, sender=None):
         self.message2 = models.Message.objects.create(
             chat=self.chat1,
-            sender=self.user,
+            sender=sender if sender else self.user,
             text="Hello World Again!",
+        )    
+
+    def addFiveMessages(self, sender=None):
+        return [
+            models.Message.objects.create(
+                chat=self.chat1,
+                sender=sender if sender else self.user,
+                text="Message %d"%i,
+            )
+            for i in range(5)
+        ]
+
+    def removeMessages(self):
+        models.Message.objects.all().delete()
+
+    def addFeedbackQuestions(self):
+        self.mandatory_feedback_question1 = models.FeedbackQuestion.objects.create(
+            text='Feedback question: rating response 1',
+            order_index=1,
+            type=models.FEEDBACK_TYPE_RATING,
+        )
+        self.mandatory_feedback_question2 = models.FeedbackQuestion.objects.create(
+            text='Feedback question: rating response 2',
+            order_index=2,
+            type=models.FEEDBACK_TYPE_RATING,
+        )
+        self.optional_feedback_question1 = models.FeedbackQuestion.objects.create(
+            text='Feedback question: text response',
+            order_index=3,
+            type=models.FEEDBACK_TYPE_TEXT,
         )

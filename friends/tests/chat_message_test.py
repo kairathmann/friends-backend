@@ -25,6 +25,20 @@ class ChatMessageTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(len(response.data.get('messages')), 1)
         self.assertEqual(response.data.get('messages')[0]['text'], 'Hello World!')
 
+    def test_chat_has_many_ordered_messages(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data.get('messages')), 5)
+        for i in range(5):
+            self.assertEqual(response.data.get('messages')[i]['text'], 'Message %d'%(i))
+
     def test_unread_status_updates_after_get(self):
         self.addMessage()
 
@@ -110,3 +124,137 @@ class ChatMessageTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get('text'), 'Hello World!')
+
+    def test_get_limit_to_one_newest_message(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'limit':1},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data.get('messages')), 1)
+        self.assertEqual(response.data.get('messages')[0]['text'], 'Message 4')
+
+    def test_get_limit_to_more_messages_than_possible_gets_whole_history(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'limit':42}, #way too many
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data.get('messages')), 5)
+
+    def test_get_with_limit_to_invalid_number_HTTP400(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'limit':'I am not even a number'},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_three_messages_starting_from_second_latest(self):
+        messages = self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={
+                'from_message': messages[4].id,
+                'limit': 3
+            },
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data.get('messages')), 3)
+        self.assertEqual(response.data.get('messages')[0]['text'], 'Message 1')
+        self.assertEqual(response.data.get('messages')[1]['text'], 'Message 2')
+        self.assertEqual(response.data.get('messages')[2]['text'], 'Message 3')
+
+    def test_get_from_invalid_message_HTTP400(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'from_message':'I am not even a number'},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_from_unknown_message_HTTP400(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'from_message':'99999999999'},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_limit_to_negative_number_of_messages_HTTP400(self):
+        self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'limit':-42},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_from_head_until_second_latest_message(self):
+        messages = self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'until_message': messages[3].id},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data.get('messages')), 1)
+        self.assertEqual(response.data.get('messages')[0]['text'], 'Message 4')
+
+    def test_get_from_second_until_third_latest_message(self):
+        messages = self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'from_message': messages[3].id, 'until_message': messages[1].id},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data.get('messages')), 1)
+        self.assertEqual(response.data.get('messages')[0]['text'], 'Message 2')
+
+    def test_get_from_third_latest_until_second_latest_HTTP400(self):
+        messages = self.addFiveMessages()
+
+        response = self.client.get(
+            reverse_lazy(self.view(), kwargs={"id": self.chat1.id}),
+            data={'from_message': messages[2].id, 'until_message': messages[3].id},
+            content_type='application/json',
+            **self.header,
+        )
+
+        self.assertEqual(response.status_code, 400)

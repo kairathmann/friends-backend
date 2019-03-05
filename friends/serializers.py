@@ -27,6 +27,7 @@ class LunaUserSerializer(serializers.ModelSerializer):
             'username',
             'color',
             'emoji',
+            'notification_id'
         ]
 
 
@@ -84,8 +85,8 @@ class SurveyAnsweredQuestionSerializer(serializers.ModelSerializer):
 
     def get_last_answer_id(self, obj):
         response = models.SurveyResponse.objects \
-            .filter(answer__question=obj, user_id=self.context.get('request').user.id) \
-            .latest('timestamp')
+            .filter(answer__question=obj, user_id=self.context.get('user').id) \
+            .last()
         return response.answer_id
 
 
@@ -118,11 +119,31 @@ class ChatUsersSerializer(serializers.ModelSerializer):
         fields = [
             'user',
             'last_read',
+            'feedback_requested'
         ]
 
 
 class ChatDetailSerializer(serializers.ModelSerializer):
-    messages = MessageSerializer(many=True)
+    messages = serializers.SerializerMethodField()
+    def get_messages(self, chat):
+        chat_messages = chat.messages
+
+        from_message = self.context.get('from_message')
+        if from_message:
+            chat_messages = chat_messages.filter(id__lt=from_message)
+
+        until_message = self.context.get('until_message')
+        if until_message:
+            chat_messages = chat_messages.filter(id__gt=until_message)
+
+        chat_messages = chat_messages.reverse()
+        limit = self.context.get('limit')
+        if limit and not until_message: # until_message overrides limit
+            if chat_messages.count() > limit:
+                chat_messages = chat_messages.all()[chat_messages.count()-limit:]
+
+        return MessageSerializer(chat_messages, many=True).data
+
     chatusers_set = ChatUsersSerializer(many=True)
 
     class Meta:
@@ -141,7 +162,7 @@ class ChatOverviewSerializer(serializers.ModelSerializer):
 
     last_message = serializers.SerializerMethodField()
     def get_last_message(self, chat):
-        return MessageSerializer(chat.messages.last()).data
+        return MessageSerializer(chat.messages.first()).data
 
     unread_messages = serializers.SerializerMethodField()
     def get_unread_messages(self, chat):
@@ -167,3 +188,24 @@ class ChatOverviewSerializer(serializers.ModelSerializer):
         ]
 
 
+class FeedbackQuestionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.FeedbackQuestion
+        fields = [
+            'text',
+            'order_index',
+            'type',
+        ]
+
+
+class FeedbackResponseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.FeedbackResponse
+        fields = [
+            'question',
+            'chat_user',
+            'rating_response',
+            'text_response',
+        ]

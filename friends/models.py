@@ -1,11 +1,14 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db import transaction
 from django.dispatch import receiver
 from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator
 from rest_framework.authtoken.models import Token
+import uuid
 from .utilities.chat_utils import ChatUtils
+from .utilities.user_utils import UserUtils
 
 CITY_MAX_LENGTH = 35
 
@@ -45,7 +48,7 @@ class Color(models.Model):
     A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
     """
     hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
-    brian_bot = models.BooleanField(default=False) # For the special Brian Bot color (not available to other users)
+    brian_bot = models.BooleanField(default=False)  # For the special Brian Bot color (not available to other users)
 
 
 class LunaUser(AbstractUser):
@@ -56,6 +59,8 @@ class LunaUser(AbstractUser):
     city = models.CharField(max_length=CITY_MAX_LENGTH, db_index=True)
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
     emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
+    is_brian_bot = models.BooleanField(default=False)
+    notification_id=models.UUIDField(null=False, default=uuid.uuid4, unique=True)
 
 
 class LegacyDataSet(models.Model):
@@ -93,12 +98,6 @@ class LegacyDataSet(models.Model):
     submitted_at = models.DateTimeField()
 
     token = models.CharField(max_length=LEGACY_TOKEN_MAX_LENGTH)
-
-
-@receiver(models.signals.post_save, sender=LunaUser)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.get_or_create(user=instance)
 
 
 class SurveyQuestion(models.Model):
@@ -204,6 +203,9 @@ class Message(models.Model):
 
     timestamp = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        ordering = ('-id',)
+
 
 class ChatUsers(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
@@ -213,17 +215,107 @@ class ChatUsers(models.Model):
     # There may be a clever trigger on on_delete to find the next last-read message.
     last_read = models.ForeignKey(Message, null=True, on_delete=models.SET_NULL)
 
+    # This flag set to True on when we have requested the user to give us feedback about the chat partner, and cleared
+    # back to False when the user has given feedback.
+    feedback_requested = models.BooleanField(default=False)
+
     class Meta:
         unique_together = ('chat', 'user')
 
 
-@receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
-def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
-    if created and not instance.is_staff:
-        brian_bot_color = Color.objects.get(brian_bot=True)
-        brian_bot = LunaUser.objects.get(is_staff=True, color=brian_bot_color)
-        ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
+FEEDBACK_QUESTION_TEXT_MAX_LENGTH = 255
+FEEDBACK_TYPE_RATING = 1
+FEEDBACK_TYPE_TEXT = 2
 
-        # For dogfooding chat inside Luna, we also create chats with all other users.
-        for user in get_user_model().objects.exclude(is_staff=True).exclude(id=instance.id):
-            ChatUtils.create_chat([instance, user], 'This is a chat with a human.')
+FEEDBACK_TYPES = (
+    (FEEDBACK_TYPE_RATING, "Rating"),
+    (FEEDBACK_TYPE_TEXT, "Text"),
+)
+
+MIN_FEEDBACK_RATING = 1
+MAX_FEEDBACK_RATING = 5
+
+
+class FeedbackQuestion(models.Model):
+    text = models.CharField(max_length=FEEDBACK_QUESTION_TEXT_MAX_LENGTH, unique=True)
+
+    order_index = models.PositiveSmallIntegerField(db_index=True, unique=True)
+
+    type = models.PositiveSmallIntegerField(choices=FEEDBACK_TYPES)
+
+    is_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order_index', ]
+
+    def __str__(self):
+        return self.text
+
+
+class FeedbackResponse(models.Model):
+    question = models.ForeignKey(FeedbackQuestion, related_name='feedback_responses', on_delete=models.CASCADE)
+
+    chat_user = models.ForeignKey(ChatUsers, null=True, blank=True, on_delete=models.SET_NULL)
+
+    rating_response = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(MIN_FEEDBACK_RATING), MaxValueValidator(MAX_FEEDBACK_RATING)]
+    )
+
+    text_response = models.TextField(null=True, blank=True)
+
+
+TERMS_TYPE_TERMS_OF_SERVICE = 1
+TERMS_TYPE_PRIVACY_POLICY = 2
+TERMS_TYPES = (
+    (TERMS_TYPE_TERMS_OF_SERVICE, "Terms of Service"),
+    (TERMS_TYPE_PRIVACY_POLICY, "Privacy Policy"),
+)
+
+
+# For now we won't load ToS and PP via a REST endpoint but hardcode it in the mobile app.
+class Terms(models.Model):
+    """
+    Represents a Terms and Conditions or Privacy Policy text that a user can agree to.
+    """
+
+    text = models.TextField()
+
+    type = models.PositiveSmallIntegerField(choices=TERMS_TYPES)
+
+    # Current terms are auto-assigned to new users.
+    # One does not simply change the current terms.
+    # New terms will need a new API and mobile app release.
+    is_current = models.BooleanField(default=False)
+
+
+class UserTermsAcceptance(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    terms = models.ForeignKey(Terms, on_delete=models.CASCADE)
+
+    accepted_timestamp = models.DateTimeField(default=timezone.now, db_index=True, editable=False)
+
+
+@receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
+@transaction.atomic
+def handle_new_user(sender, instance=None, created=False, **kwargs):
+    """
+    This function contains actions to perform upon user creation.
+    :param sender:
+    :param instance:
+    :param created:
+    :param kwargs:
+    :return:
+    """
+    if created:
+        # Auth Token
+        Token.objects.get_or_create(user=instance)
+
+        # Create a Brian Bot Chat with any non-staff user.
+        # Staff users are the Brian Bot itself and any superusers created on the commandline.
+        if not instance.is_staff:
+            brian_bot = UserUtils.get_brian_bot()
+            ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')

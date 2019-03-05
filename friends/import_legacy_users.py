@@ -1,9 +1,11 @@
 from dateutil import parser
+from django.db import transaction
 from . import models
 import csv
 import pytz
 
 
+@transaction.atomic
 def import_legacy_users():
 
     # questions and answers
@@ -422,6 +424,10 @@ def import_legacy_users():
         text='no',
     )
 
+    privacy_policy = models.Terms.objects.get(
+        text='The prelaunch is part of the Luminos research study. Your data will be used for the purposes of *research only*. Your data will not be released to any other organization or person. *Your data will not be sold.* Anonymized data will be used to improve our matching engine. We will follow up with exit surveys.',
+    )
+
     with open('legacy_users.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=',')
         count = 1
@@ -456,6 +462,11 @@ def import_legacy_users():
                 city=location,
                 date_joined=submitted_at,
             )
+            models.UserTermsAcceptance.objects.create(
+                user=user,
+                terms=privacy_policy,
+                accepted_timestamp=submitted_at,
+            )
             models.LegacyDataSet.objects.create(
                 user=user,
                 good_user=good_user,
@@ -470,12 +481,6 @@ def import_legacy_users():
                 submitted_at=submitted_at,
                 token=token,
             )
-            if entry_round == 1:
-                round1.users.add(user)
-
-            # Simplification: Every user from round 1 is also assigned to round 2.
-            if entry_round >= 1:
-                round2.users.add(user)
 
             # Question data
 

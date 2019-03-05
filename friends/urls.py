@@ -29,6 +29,8 @@ urlpatterns = [
     path('api/v1/questions/answered/', views.QuestionsAnswered.as_view(), name='questions_answered'),
     path('api/v1/responses/', views.Responses.as_view(), name='responses'),
     path('api/v1/self/', views.Self.as_view(), name='self'),
+    path('api/v1/feedback_questions/', views.FeedbackQuestions.as_view(), name='feedback_questions'),
+    path('api/v1/chats/<int:id>/feedback_responses/', views.FeedbackResponses.as_view(), name='feedback_responses'),
     # For migrating Telegram users to Luminos
     path('api/v1/legacy/', views.Legacy.as_view(), name='legacy'),
 

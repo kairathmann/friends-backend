@@ -31,6 +31,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data['city'], '')
         self.assertEqual(response.data['first_name'], '')
         self.assertEqual(response.data['username'], '+498000000000')
+        self.assertTrue(len(response.data['notification_id']) > 0)
 
     def test_post_existing(self):
         """
@@ -55,6 +56,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.data['city'], self.user.city)
         self.assertEqual(response.data['first_name'], self.user.first_name)
         self.assertEqual(response.data['username'], '+498000000000')
+        self.assertTrue(len(response.data['notification_id']) > 0)
 
     def test_post_400_phone_number_invalid(self):
         response = self.client.post(

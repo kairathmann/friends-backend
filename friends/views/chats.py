@@ -10,13 +10,7 @@ class Chats(APIView):
 
     def get(self, request, **kwargs):
         user = request.user
-
-        round_id = kwargs.get('round_id')
-
-        if round_id:
-            chats = models.Chat.objects.filter(chatusers__user=user, round=1)
-        else:
-            chats = models.Chat.objects.filter(chatusers__user=user, round__isnull=True)
+        chats = models.Chat.objects.filter(chatusers__user=user)
 
         serializer = serializers.ChatOverviewSerializer(chats, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

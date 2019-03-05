@@ -114,19 +114,6 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(0, len(response.data))
 
-    def test_no_chat_for_current_round(self):
-        self.addChat([self.user, self.user2], 1)
-
-        response = self.client.get(
-            reverse_lazy(self.view()),
-            content_type='application/json',
-            **self.header,
-        )
-
-        self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(0, len(response.data))
-
     # TODO Re-add tests when dogfooding via pairing everyone with everyone has concluded.
     # def test_chat_with_brian_bot_created_for_user(self):
     #     self.addOneUser()

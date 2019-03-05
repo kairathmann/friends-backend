@@ -3,11 +3,13 @@ from authy.api import AuthyApiClient
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from .. import models
 from .. import serializers
 from ..utilities.validation_utility import ValidationUtility
 
@@ -64,12 +66,31 @@ class VerificationToken(APIView):
                 username=e164,
             )
             Token.objects.get_or_create(user=user)
+            if created:
+                # The mobile app displays language that users agree to ToS and PP by signing up.
+                # Save user acceptance of ToS and PP upon successful SMS validation.
+                now = timezone.now()
+                for terms_instance in models.Terms.objects.filter(is_current=True):
+                    models.UserTermsAcceptance.objects.create(
+                        user=user,
+                        terms=terms_instance,
+                        accepted_timestamp=now,
+                    )
         else:
             if get_user_model().objects.filter(username=e164).exists():
                 return Response('user_conflict', status=status.HTTP_409_CONFLICT)
             request.user.username = e164
             request.user.save()
             user = request.user
+            # The mobile app displays language that users agree to ToS and PP by signing up.
+            # Save user acceptance of ToS and PP upon successful SMS validation.
+            now = timezone.now()
+            for terms_instance in models.Terms.objects.filter(is_current=True):
+                models.UserTermsAcceptance.objects.create(
+                    user=user,
+                    terms=terms_instance,
+                    accepted_timestamp=now,
+                )
 
         serializer = serializers.LunaUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
