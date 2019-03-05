@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db import transaction
 from django.dispatch import receiver
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -48,7 +48,7 @@ class Color(models.Model):
     A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
     """
     hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
-    brian_bot = models.BooleanField(default=False) # For the special Brian Bot color (not available to other users)
+    brian_bot = models.BooleanField(default=False)  # For the special Brian Bot color (not available to other users)
 
 
 class LunaUser(AbstractUser):
@@ -98,12 +98,6 @@ class LegacyDataSet(models.Model):
     submitted_at = models.DateTimeField()
 
     token = models.CharField(max_length=LEGACY_TOKEN_MAX_LENGTH)
-
-
-@receiver(models.signals.post_save, sender=LunaUser)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.get_or_create(user=instance)
 
 
 class SurveyQuestion(models.Model):
@@ -229,13 +223,6 @@ class ChatUsers(models.Model):
         unique_together = ('chat', 'user')
 
 
-@receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
-def create_chat_with_brian_bot(sender, instance=None, created=False, **kwargs):
-    if created and not instance.is_staff:
-        brian_bot = UserUtils.get_brian_bot()
-        ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
-
-
 FEEDBACK_QUESTION_TEXT_MAX_LENGTH = 255
 FEEDBACK_TYPE_RATING = 1
 FEEDBACK_TYPE_TEXT = 2
@@ -247,6 +234,7 @@ FEEDBACK_TYPES = (
 
 MIN_FEEDBACK_RATING = 1
 MAX_FEEDBACK_RATING = 5
+
 
 class FeedbackQuestion(models.Model):
     text = models.CharField(max_length=FEEDBACK_QUESTION_TEXT_MAX_LENGTH, unique=True)
@@ -276,3 +264,58 @@ class FeedbackResponse(models.Model):
     )
 
     text_response = models.TextField(null=True, blank=True)
+
+
+TERMS_TYPE_TERMS_OF_SERVICE = 1
+TERMS_TYPE_PRIVACY_POLICY = 2
+TERMS_TYPES = (
+    (TERMS_TYPE_TERMS_OF_SERVICE, "Terms of Service"),
+    (TERMS_TYPE_PRIVACY_POLICY, "Privacy Policy"),
+)
+
+
+# For now we won't load ToS and PP via a REST endpoint but hardcode it in the mobile app.
+class Terms(models.Model):
+    """
+    Represents a Terms and Conditions or Privacy Policy text that a user can agree to.
+    """
+
+    text = models.TextField()
+
+    type = models.PositiveSmallIntegerField(choices=TERMS_TYPES)
+
+    # Current terms are auto-assigned to new users.
+    # One does not simply change the current terms.
+    # New terms will need a new API and mobile app release.
+    is_current = models.BooleanField(default=False)
+
+
+class UserTermsAcceptance(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    terms = models.ForeignKey(Terms, on_delete=models.CASCADE)
+
+    accepted_timestamp = models.DateTimeField(default=timezone.now, db_index=True, editable=False)
+
+
+@receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
+@transaction.atomic
+def handle_new_user(sender, instance=None, created=False, **kwargs):
+    """
+    This function contains actions to perform upon user creation.
+    :param sender:
+    :param instance:
+    :param created:
+    :param kwargs:
+    :return:
+    """
+    if created:
+        # Auth Token
+        Token.objects.get_or_create(user=instance)
+
+        # Create a Brian Bot Chat with any non-staff user.
+        # Staff users are the Brian Bot itself and any superusers created on the commandline.
+        if not instance.is_staff:
+            brian_bot = UserUtils.get_brian_bot()
+            ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
