@@ -193,6 +193,7 @@ class FeedbackQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FeedbackQuestion
         fields = [
+            'id',
             'text',
             'order_index',
             'type',
