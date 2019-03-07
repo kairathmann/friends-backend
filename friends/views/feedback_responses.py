@@ -48,8 +48,6 @@ class FeedbackResponses(APIView):
 
                     response_object.clean_fields()
 
-                    response_object.save()
-
                     # Increment mandatory_questions_answered tally
                     # rating_response questions are mandatory, text_response questions are not mandatory
                     if response_object.rating_response:
@@ -61,10 +59,13 @@ class FeedbackResponses(APIView):
 
             # Calculate total mandatory questions
             total_mandatory_questions = models.FeedbackQuestion.objects.filter(is_enabled=True, type=models.FEEDBACK_TYPE_RATING).count()
+            if total_mandatory_questions != mandatory_questions_answered:
+                return None, Response('not_all_mandatory_questions_answered', status=status.HTTP_400_BAD_REQUEST)
 
-        # Check whether all mandatory questions have been answered
-        if total_mandatory_questions == mandatory_questions_answered:
-            return response_objects, None
-        else:
-            return None, Response('not_all_mandatory_questions_answered', status=status.HTTP_400_BAD_REQUEST)
+            models.FeedbackResponse.objects.bulk_create(response_objects)
+
+            self.chat_user.feedback_requested = False
+            self.chat_user.save()
+
+        return response_objects, None
 

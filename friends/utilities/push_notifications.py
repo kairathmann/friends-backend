@@ -25,7 +25,7 @@ class NotificationService:
         return response
 
 
-    def build_new_message_notification_body(self, message, recipient):
+    def build_new_message_notification_body(self, message, recipient, feedback_requested):
         return {
             "app_id": base.ONESIGNAL_APPID,
             "headings": {
@@ -50,16 +50,17 @@ class NotificationService:
                 "message_sender": LunaUserPartnerSerializer(message.sender).data,
                 "message_recipient": LunaUserPartnerSerializer(recipient).data,
                 "message_text": message.text,
-                "message_timestamp": message.timestamp.isoformat()
+                "message_timestamp": message.timestamp.isoformat(),
+                "feedback_requested": feedback_requested
             }
         }
 
 
-    def dispatch_new_message_notification(self, message, recipient):
+    def dispatch_new_message_notification(self, message, recipient_chatuser):
         if base.ONESIGNAL_DISABLE == "1":
             return
 
-        notification_body = self.build_new_message_notification_body(message, recipient)
+        notification_body = self.build_new_message_notification_body(message, recipient_chatuser.user, recipient_chatuser.feedback_requested)
         return self.dispatch_notification(notification_body)
 
 
