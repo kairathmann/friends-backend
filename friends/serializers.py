@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from . import models
 
+
 class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Color
@@ -10,23 +11,50 @@ class ColorSerializer(serializers.ModelSerializer):
         ]
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Location
+        fields = [
+            'id',
+            'mapbox_id',
+            'name',
+            'full_name',
+            'latitude',
+            'longitude',
+        ]
+
+
 class LunaUserSerializer(serializers.ModelSerializer):
     '''
     Serialize data about a LunaUser, including the auth token and other private details
     '''
 
     color = ColorSerializer()
+    latest_location = serializers.SerializerMethodField()
+    def get_latest_location(self, user):
+        latest = models.Location.objects.filter(user=user).last()
+        return LocationSerializer(latest).data
+
+    
+    def to_representation(self, obj):
+        ret = super(LunaUserSerializer, self).to_representation(obj)
+
+        if ret['latest_location'] is None:
+            del ret['latest_location']
+        return ret
+
+
 
     class Meta:
         model = models.LunaUser
         fields = [
             'id',
             'auth_token',
-            'city',
             'first_name',
             'username',
             'color',
             'emoji',
+            'latest_location',
             'notification_id'
         ]
 
@@ -42,7 +70,6 @@ class LunaUserPartnerSerializer(serializers.ModelSerializer):
         model = models.LunaUser
         fields = [
             'id',
-            'city',
             'first_name',
             'color',
             'emoji',

@@ -28,7 +28,6 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         new_user = models.LunaUser.objects.filter(is_staff=False).exclude(id=self.user.id).get()
         self.assertEqual(response.data['id'], new_user.id)
         self.assertEqual(response.data['auth_token'], new_user.auth_token.key)
-        self.assertEqual(response.data['city'], '')
         self.assertEqual(response.data['first_name'], '')
         self.assertEqual(response.data['username'], '+498000000000')
         self.assertTrue(len(response.data['notification_id']) > 0)
@@ -53,7 +52,6 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(models.LunaUser.objects.count(), 1)
         self.assertEqual(response.data['id'], self.user.id)
         self.assertEqual(response.data['auth_token'], self.user.auth_token.key)
-        self.assertEqual(response.data['city'], self.user.city)
         self.assertEqual(response.data['first_name'], self.user.first_name)
         self.assertEqual(response.data['username'], '+498000000000')
         self.assertTrue(len(response.data['notification_id']) > 0)
@@ -79,7 +77,6 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         # Create conflicting user
         models.LunaUser.objects.create_user(
             username='+498000000000',
-            city='conflicting_city',
             first_name='conflicting_first_name',
             email='conflicting@example.com',
             password='conflicting_password')
