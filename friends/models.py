@@ -59,7 +59,7 @@ class LunaUser(AbstractUser):
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
     emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
     is_brian_bot = models.BooleanField(default=False)
-    notification_id=models.UUIDField(null=False, default=uuid.uuid4, unique=True)
+    notification_id = models.UUIDField(null=False, default=uuid.uuid4, unique=True)
 
 
 class Location(models.Model):
@@ -318,6 +318,17 @@ class UserTermsAcceptance(models.Model):
     terms = models.ForeignKey(Terms, on_delete=models.CASCADE)
 
     accepted_timestamp = models.DateTimeField(default=timezone.now, db_index=True, editable=False)
+
+
+class PhoneVerificationExemption(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    country_code = models.CharField(max_length=5)
+
+    phone_number = models.CharField(max_length=18)
+
+    token = models.CharField(max_length=4)
 
 
 @receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)

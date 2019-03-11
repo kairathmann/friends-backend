@@ -51,6 +51,18 @@ class VerificationToken(APIView):
         except phonenumbers.NumberParseException:
             return Response('phone_number_invalid', status=status.HTTP_400_BAD_REQUEST)
 
+        # Exemption
+        exemption = models.PhoneVerificationExemption.objects.filter(
+            country_code=country_code,
+            phone_number=phone_number,
+        ).first()
+        if exemption:
+            if exemption.token == token:
+                user = exemption.user
+                Token.objects.get_or_create(user=user)
+            else:
+                return Response('verification_failed', status=status.HTTP_400_BAD_REQUEST)
+
         # Authy verification
         if not settings.AUTHY_DISABLE:
             verification = authy_api.phones.verification_check(
