@@ -350,4 +350,4 @@ def handle_new_user(sender, instance=None, created=False, **kwargs):
         # Staff users are the Brian Bot itself and any superusers created on the commandline.
         if not instance.is_staff:
             brian_bot = UserUtils.get_brian_bot()
-            ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
+            ChatUtils.create_chat([brian_bot, instance], 'Welcome to Luminos! If you have any questions, suggestions, or even if you just want to chat, you can message us anytime!')
