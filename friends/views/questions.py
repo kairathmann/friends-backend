@@ -21,8 +21,7 @@ class Questions(APIView):
         # Exclude multiresponse questions
         questions = questions.filter(max_answers=1)
 
-        # Shuffle
-        questions = questions.order_by('?')
+        questions = questions.order_by('id')
 
         serializer = serializers.SurveyQuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

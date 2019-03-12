@@ -4,6 +4,9 @@ import requests
 from ..settings import base
 from ..serializers import LunaUserPartnerSerializer
 
+NEW_MESSAGE_NOTIFICATION = 'NEW_MESSAGE_NOTIFICATION'
+FEEDBACK_REQUEST_NOTIFICATION = 'FEEDBACK_REQUEST_NOTIFICATION'
+
 
 class NotificationService:
     def dispatch_notification(self, notification_body):
@@ -24,8 +27,7 @@ class NotificationService:
 
         return response
 
-
-    def build_new_message_notification_body(self, message, recipient):
+    def build_new_message_notification_body(self, message, recipient, feedback_requested):
         return {
             "app_id": base.ONESIGNAL_APPID,
             "headings": {
@@ -36,13 +38,15 @@ class NotificationService:
                 "en": message.text,
             },
             "isEmail": False,
-            "android_group": message.chat.id,
-            "android_group_message": {"en": "You have $[notif_count] new messages from {0}".format(message.sender.first_name)},
-            "thread_id": message.chat.id,
+            "android_group": "{0}-{1}".format(NEW_MESSAGE_NOTIFICATION, message.chat.id),
+            "android_group_message": {
+                "en": "You have $[notif_count] new messages from {0}".format(message.sender.first_name)},
+            "thread_id": "{0}-{1}".format(NEW_MESSAGE_NOTIFICATION, message.chat.id),
             "summary_arg": message.sender.first_name,
             "ios_badgeType": "Increase",
             "ios_badgeCount": 1,
             "data": {
+                "type": NEW_MESSAGE_NOTIFICATION,
                 "chat_type": message.chat.type,
                 "round_id": message.chat.round,
                 "chat_id": message.chat.id,
@@ -50,40 +54,29 @@ class NotificationService:
                 "message_sender": LunaUserPartnerSerializer(message.sender).data,
                 "message_recipient": LunaUserPartnerSerializer(recipient).data,
                 "message_text": message.text,
-                "message_timestamp": message.timestamp.isoformat()
+                "message_timestamp": message.timestamp.isoformat(),
+                "feedback_requested": feedback_requested
             }
         }
 
-
-    def dispatch_new_message_notification(self, message, recipient):
+    def dispatch_new_message_notification(self, message, recipient_chatuser):
         if base.ONESIGNAL_DISABLE == "1":
             return
 
-        notification_body = self.build_new_message_notification_body(message, recipient)
+        notification_body = self.build_new_message_notification_body(message, recipient_chatuser.user,
+                                                                     recipient_chatuser.feedback_requested)
         return self.dispatch_notification(notification_body)
 
+    def build_feedback_request_notification_body(self, luminos_bot_message, chat, recipient):
+        body = self.build_new_message_notification_body(luminos_bot_message, recipient, False)
 
-    def build_feedback_request_notification_body(self, chat, recipient):
-        return {
-            "app_id": base.ONESIGNAL_APPID,
-            "headings": {
-                "en": 'I CAN HAZ FEEDBACK' #TODO
-            },
-            "include_external_user_ids": [str(recipient.notification_id)],
-            "contents": {
-                "en": 'FOR REALZ, I CAN HAZ FEEDBACK???!?',
-            },
-            "isEmail": False,
-            "thread_id": chat.id,
-            "data": {
-                "chat_id": chat.id,
-            }
-        }
+        body["data"]["type"] = FEEDBACK_REQUEST_NOTIFICATION
+        body["data"]["feedback_requested_for_chat"] = chat.id
+        return body
 
-
-    def dispatch_feedback_request_notification(self, chat, recipient):
+    def dispatch_feedback_request_notification(self, luminos_bot_message, chat, recipient):
         if base.ONESIGNAL_DISABLE == "1":
             return
 
-        notification_body = self.build_feedback_request_notification_body(chat, recipient)
+        notification_body = self.build_feedback_request_notification_body(luminos_bot_message, chat, recipient)
         return self.dispatch_notification(notification_body)

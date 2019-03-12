@@ -10,7 +10,7 @@ import uuid
 from .utilities.chat_utils import ChatUtils
 from .utilities.user_utils import UserUtils
 
-CITY_MAX_LENGTH = 35
+CITY_MAX_LENGTH = 100
 
 # From django.db.models.fields.EmailField
 EMAIL_MAX_LENGTH = 254
@@ -56,11 +56,32 @@ class LunaUser(AbstractUser):
     The username is the user's phone number in E164 format.
     """
 
-    city = models.CharField(max_length=CITY_MAX_LENGTH, db_index=True)
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
     emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
     is_brian_bot = models.BooleanField(default=False)
-    notification_id=models.UUIDField(null=False, default=uuid.uuid4, unique=True)
+    notification_id = models.UUIDField(null=False, default=uuid.uuid4, unique=True)
+
+
+class Location(models.Model):
+    """
+    Location is user's city of choice used for matching via proximity etc.
+
+        full_name: value displayed for user at dropdown - 'Warszawa, Mazowieckie, Poland'
+        name: short-hand value of location - 'Warszawa'
+        mapbox_id: Unique identifier of Geolocation object returned from Mapbox API - storing in case of future needs - 'place.12284077938513600'
+        latitude: Floating-point value between 0 and 90 degrees - 21.03333 
+        longitude: Floating-point value between -180 and 180 degrees - 52.21667
+    """
+
+    mapbox_id = models.CharField(max_length=255)
+    name = models.CharField(max_length=CITY_MAX_LENGTH)
+    full_name = models.CharField(max_length=CITY_MAX_LENGTH)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    user = models.ForeignKey(LunaUser, on_delete=models.CASCADE)
+
+    def __eq__(self, other):
+        return self.mapbox_id == other.mapbox_id
 
 
 class LegacyDataSet(models.Model):
@@ -299,6 +320,17 @@ class UserTermsAcceptance(models.Model):
     accepted_timestamp = models.DateTimeField(default=timezone.now, db_index=True, editable=False)
 
 
+class PhoneVerificationExemption(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    country_code = models.CharField(max_length=5)
+
+    phone_number = models.CharField(max_length=18)
+
+    token = models.CharField(max_length=4)
+
+
 @receiver(models.signals.post_save, sender=settings.AUTH_USER_MODEL)
 @transaction.atomic
 def handle_new_user(sender, instance=None, created=False, **kwargs):
@@ -318,4 +350,4 @@ def handle_new_user(sender, instance=None, created=False, **kwargs):
         # Staff users are the Brian Bot itself and any superusers created on the commandline.
         if not instance.is_staff:
             brian_bot = UserUtils.get_brian_bot()
-            ChatUtils.create_chat([brian_bot, instance], 'This is the Brian Bot chat.')
+            ChatUtils.create_chat([brian_bot, instance], 'Welcome to Luminos! If you have any questions, suggestions, or even if you just want to chat, you can message us anytime!')

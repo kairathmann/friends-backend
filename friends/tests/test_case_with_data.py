@@ -26,13 +26,13 @@ class TestCaseWithData(TestCase):
         models.Color.objects.all().delete()
         models.FeedbackQuestion.objects.all().delete()
         models.FeedbackResponse.objects.all().delete()
+        models.Location.objects.all().delete()
 
     def addBrianBot(self):
         brian_bot_color = models.Color.objects.get(brian_bot=True)
 
         self.brianBot = models.LunaUser.objects.create_user(
             username='Brian-Bot',
-            city='Luminos',
             emoji='⭐',
             color=brian_bot_color,
             is_staff=True,
@@ -90,7 +90,6 @@ class TestCaseWithData(TestCase):
     def addAuthenticatedUser(self):
         self.user = models.LunaUser.objects.create_user(
             username='test',
-            city='test-city',
             first_name='Test Name',
             email='test@example.com',
             color=models.Color.objects.get(id=1),
@@ -98,11 +97,18 @@ class TestCaseWithData(TestCase):
             password='test')
         self.token = Token.objects.get(user=self.user).key
         self.header = {'HTTP_AUTHORIZATION': "Bearer {}".format(self.token)}
+        models.Location.objects.create(
+            user_id=self.user.id,
+            mapbox_id='123',
+            latitude=1,
+            longitude=3.14159,
+            full_name='I am full name',
+            name='name',
+        )
 
     def addMoreUsers(self):
         self.user2 = models.LunaUser.objects.create_user(
             username='test2',
-            city='test-city',
             first_name='Second',
             email='test2@example.com',
             color=models.Color.objects.get(id=2),
@@ -111,7 +117,6 @@ class TestCaseWithData(TestCase):
 
         self.user3 = models.LunaUser.objects.create_user(
             username='test3',
-            city='test-city',
             first_name='Third',
             email='test3@example.com',
             color=models.Color.objects.get(id=2),
@@ -121,7 +126,6 @@ class TestCaseWithData(TestCase):
     def addOneUser(self):
         self.user4 = models.LunaUser.objects.create_user(
             username='test4',
-            city='test-city',
             first_name='Fourth',
             email='test4@example.com',
             color=models.Color.objects.get(id=2),

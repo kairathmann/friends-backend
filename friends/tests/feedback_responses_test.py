@@ -42,6 +42,7 @@ class FeedbackResponsesTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data), models.FeedbackResponse.objects.filter(chat_user__user__id=self.user.id).count())
+        self.assertFalse(models.ChatUsers.objects.filter(user=self.user, chat=self.chat1).get().feedback_requested)
         self.assertEqual(response.data[0].get('rating_response'), 3)
         self.assertEqual(response.data[1].get('rating_response'), 4)
         self.assertEqual(response.data[2].get('text_response'), 'feedback text response')

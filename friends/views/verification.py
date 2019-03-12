@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 import json
 import phonenumbers
 
+from .. import models
 from ..utilities.validation_utility import ValidationUtility
 
 
@@ -45,6 +46,13 @@ class Verification(APIView):
 
         if via not in ['sms', 'call']:
             return Response('via_invalid', status=status.HTTP_400_BAD_REQUEST)
+
+        # Exemption
+        if models.PhoneVerificationExemption.objects.filter(
+            country_code=country_code,
+            phone_number=phone_number,
+        ).exists():
+            return Response(status=status.HTTP_200_OK)
 
         # Authy verification
         if not settings.AUTHY_DISABLE:

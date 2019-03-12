@@ -12,16 +12,26 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         response = self.client.put(
             reverse_lazy(self.view()),
             json.dumps({
-                'city': 'mycity',
                 'first_name': 'myfirstname',
                 'color': 2,
                 'emoji': '🤠',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 1,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                }
             }),
             content_type='application/json',
             **self.header,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get('city'), 'mycity')
+        self.assertEqual(response.data.get('latest_location').get('mapbox_id'), '123')
+        self.assertEqual(response.data.get('latest_location').get('latitude'), 1)
+        self.assertEqual(response.data.get('latest_location').get('longitude'), 3.14159)
+        self.assertEqual(response.data.get('latest_location').get('full_name'), 'I am full name')
+        self.assertEqual(response.data.get('latest_location').get('name'), 'name')
         self.assertEqual(response.data.get('first_name'), 'myfirstname')
         self.assertEqual(response.data.get('color').get('id'), 2)
         self.assertEqual(response.data.get('color').get('hex_value'), 'ABABAB')
@@ -34,7 +44,7 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 401)
 
-    def test_put_city_missing(self):
+    def test_put_location_missing(self):
         response = self.client.put(
             reverse_lazy(self.view()),
             json.dumps({
@@ -46,13 +56,119 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             **self.header,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, 'city_field_not_found')
+        self.assertEqual(response.data, 'city_missing')
+
+    def test_put_location_latitude_missing(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'first_name': 'myfirstname',
+                'color': 2,
+                'emoji': '🤠',
+                'location': {
+                    'mapbox_id': '123',
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                }
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'city_missing')
+
+    def test_put_location_longitude_missing(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'first_name': 'myfirstname',
+                'color': 2,
+                'emoji': '🤠',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                }
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'city_missing')
+
+    def test_put_location_mapbox_id_missing(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'first_name': 'myfirstname',
+                'color': 2,
+                'emoji': '🤠',
+                'location': {
+                    'latitude': 3.14159,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                }
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'city_missing')
+
+    def test_put_location_full_name_missing(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'first_name': 'myfirstname',
+                'color': 2,
+                'emoji': '🤠',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 3.14159,
+                    'longitude': 3.14159,
+                    'name': 'name',
+                }
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'city_missing')
+
+    def test_put_location_name_missing(self):
+        response = self.client.put(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'first_name': 'myfirstname',
+                'color': 2,
+                'emoji': '🤠',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 3.14159,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                }
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'city_missing')
 
     def test_put_first_name_missing(self):
         response = self.client.put(
             reverse_lazy(self.view()),
             json.dumps({
-                'city': 'mycity',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 1,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                },
                 'color': 2,
                 'emoji': '🤠'
             }),
@@ -66,7 +182,13 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         response = self.client.put(
             reverse_lazy(self.view()),
             json.dumps({
-                'city': 'mycity',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 1,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                },
                 'first_name': 'myfirstname',
                 'emoji': '🤠'
             }),
@@ -80,7 +202,13 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         response = self.client.put(
             reverse_lazy(self.view()),
             json.dumps({
-                'city': 'mycity',
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 1,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                },
                 'first_name': 'myfirstname',
                 'color': 10,
                 'emoji': '🤠'
@@ -97,7 +225,13 @@ class SelfTest(TestCaseWithAuthenticatedUser):
             json.dumps({
                 'first_name': 'myfirstname',
                 'color': 2,
-                'city': 'mycity'
+                'location': {
+                    'mapbox_id': '123',
+                    'latitude': 1,
+                    'longitude': 3.14159,
+                    'full_name': 'I am full name',
+                    'name': 'name',
+                }
             }),
             content_type='application/json',
             **self.header,
@@ -113,11 +247,14 @@ class SelfTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get('username'), 'test')
-        self.assertEqual(response.data.get('city'), 'test-city')
         self.assertEqual(response.data.get('first_name'), 'Test Name')
         self.assertEqual(response.data.get('color').get('id'), 1)
         self.assertEqual(response.data.get('color').get('hex_value'), 'AABBCC')
         self.assertEqual(response.data.get('emoji'), '😪')
+        self.assertEqual(response.data.get('latest_location').get('latitude'), 1)
+        self.assertEqual(response.data.get('latest_location').get('longitude'), 3.14159)
+        self.assertEqual(response.data.get('latest_location').get('full_name'), 'I am full name')
+        self.assertEqual(response.data.get('latest_location').get('mapbox_id'), '123')
         self.assertTrue(len(response.data.get('notification_id')) > 0)
 
     def test_get_401(self):

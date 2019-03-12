@@ -22,8 +22,11 @@ class FeedbackQuestionsTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data[0].get('id'), self.mandatory_feedback_question1.id)
         self.assertEqual(response.data[0].get('text'), self.mandatory_feedback_question1.text)
+        self.assertEqual(response.data[1].get('id'), self.mandatory_feedback_question2.id)
         self.assertEqual(response.data[1].get('text'), self.mandatory_feedback_question2.text)
+        self.assertEqual(response.data[2].get('id'), self.optional_feedback_question1.id)
         self.assertEqual(response.data[2].get('text'), self.optional_feedback_question1.text)
 
     def test_get_feedback_questions_401(self):

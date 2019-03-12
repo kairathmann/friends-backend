@@ -459,7 +459,6 @@ def import_legacy_users():
                 username=email,
                 email=email,
                 first_name=name,
-                city=location,
                 date_joined=submitted_at,
             )
             models.UserTermsAcceptance.objects.create(

@@ -28,7 +28,6 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         new_user = models.LunaUser.objects.filter(is_staff=False).exclude(id=self.user.id).get()
         self.assertEqual(response.data['id'], new_user.id)
         self.assertEqual(response.data['auth_token'], new_user.auth_token.key)
-        self.assertEqual(response.data['city'], '')
         self.assertEqual(response.data['first_name'], '')
         self.assertEqual(response.data['username'], '+498000000000')
         self.assertTrue(len(response.data['notification_id']) > 0)
@@ -53,7 +52,6 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(models.LunaUser.objects.count(), 1)
         self.assertEqual(response.data['id'], self.user.id)
         self.assertEqual(response.data['auth_token'], self.user.auth_token.key)
-        self.assertEqual(response.data['city'], self.user.city)
         self.assertEqual(response.data['first_name'], self.user.first_name)
         self.assertEqual(response.data['username'], '+498000000000')
         self.assertTrue(len(response.data['notification_id']) > 0)
@@ -79,7 +77,6 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         # Create conflicting user
         models.LunaUser.objects.create_user(
             username='+498000000000',
-            city='conflicting_city',
             first_name='conflicting_first_name',
             email='conflicting@example.com',
             password='conflicting_password')
@@ -95,3 +92,47 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 409, response.data)
         self.assertEqual(response.data, 'user_conflict')
+
+    def test_exemption_positive(self):
+        """
+        This test checks if an exempt phone number with correct token is correctly handled.
+        """
+        models.PhoneVerificationExemption.objects.create(
+            user=self.brianBot,
+            country_code='+49',
+            phone_number='15123456789',
+            token='1234',
+        )
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'phone_number': '15123456789',
+                'country_code': '49',
+                'token': '1234',
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 201, response.data)
+
+    def test_exemption_negative(self):
+        """
+        This test checks if an exempt phone number with incorrect token is correctly handled.
+        """
+        models.PhoneVerificationExemption.objects.create(
+            user=self.brianBot,
+            country_code='+49',
+            phone_number='15123456789',
+            token='1234',
+        )
+        response = self.client.post(
+            reverse_lazy(self.view()),
+            json.dumps({
+                'phone_number': '15123456789',
+                'country_code': '49',
+                'token': '4321',
+            }),
+            content_type='application/json',
+            **self.header,
+        )
+        self.assertEqual(response.status_code, 400, response.data)
