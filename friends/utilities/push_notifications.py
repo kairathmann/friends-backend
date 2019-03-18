@@ -2,7 +2,7 @@ import logging
 import requests
 
 from ..settings import base
-from ..serializers import LunaUserPartnerSerializer
+from ..serializers import LuminosUserPartnerSerializer
 
 NEW_MESSAGE_NOTIFICATION = 'NEW_MESSAGE_NOTIFICATION'
 FEEDBACK_REQUEST_NOTIFICATION = 'FEEDBACK_REQUEST_NOTIFICATION'
@@ -51,8 +51,8 @@ class NotificationService:
                 "round_id": message.chat.round,
                 "chat_id": message.chat.id,
                 "message_id": message.id,
-                "message_sender": LunaUserPartnerSerializer(message.sender).data,
-                "message_recipient": LunaUserPartnerSerializer(recipient).data,
+                "message_sender": LuminosUserPartnerSerializer(message.sender).data,
+                "message_recipient": LuminosUserPartnerSerializer(recipient).data,
                 "message_text": message.text,
                 "message_timestamp": message.timestamp.isoformat(),
                 "feedback_requested": feedback_requested

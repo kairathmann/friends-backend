@@ -17,14 +17,14 @@ class Legacy(APIView):
             return error_response
 
         # Success: user exists and has not been transferred
-        if models.LunaUser.objects.filter(username=email).exists():
-            user = models.LunaUser.objects.get(username=email)
+        if models.LuminosUser.objects.filter(username=email).exists():
+            user = models.LuminosUser.objects.get(username=email)
             Token.objects.get_or_create(user=user)
-            serializer = serializers.LunaUserSerializer(user)
+            serializer = serializers.LuminosUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # Conflict: user has already been transferred
-        elif models.LunaUser.objects.filter(email=email).exists():
+        elif models.LuminosUser.objects.filter(email=email).exists():
             return Response('user_already_transferred', status=status.HTTP_409_CONFLICT)
 
         # User not found

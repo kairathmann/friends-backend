@@ -6,7 +6,7 @@ from .. import models
 class TestCaseWithData(TestCase):
     def setUp(self):
         # Remove users (i.e. Brian Bot) that are inserted by default
-        models.LunaUser.objects.all().delete()
+        models.LuminosUser.objects.all().delete()
 
         # Remove colors that are inserted by default
         models.Color.objects.all().delete()
@@ -19,7 +19,7 @@ class TestCaseWithData(TestCase):
 
     def tearDown(self):
         models.Chat.objects.all().delete()
-        models.LunaUser.objects.all().delete()
+        models.LuminosUser.objects.all().delete()
         models.SurveyQuestion.objects.all().delete()
         models.SurveyAnswer.objects.all().delete()
         models.SurveyResponse.objects.all().delete()
@@ -31,7 +31,7 @@ class TestCaseWithData(TestCase):
     def addBrianBot(self):
         brian_bot_color = models.Color.objects.get(brian_bot=True)
 
-        self.brianBot = models.LunaUser.objects.create_user(
+        self.brianBot = models.LuminosUser.objects.create_user(
             username='Brian-Bot',
             emoji='⭐',
             color=brian_bot_color,
@@ -40,7 +40,7 @@ class TestCaseWithData(TestCase):
         )
 
     def removeBrianBot(self):
-        models.LunaUser.objects.get(is_brian_bot=True).delete()
+        models.LuminosUser.objects.get(is_brian_bot=True).delete()
 
     def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(
@@ -88,7 +88,7 @@ class TestCaseWithData(TestCase):
         )
 
     def addAuthenticatedUser(self):
-        self.user = models.LunaUser.objects.create_user(
+        self.user = models.LuminosUser.objects.create_user(
             username='test',
             first_name='Test Name',
             email='test@example.com',
@@ -107,7 +107,7 @@ class TestCaseWithData(TestCase):
         )
 
     def addMoreUsers(self):
-        self.user2 = models.LunaUser.objects.create_user(
+        self.user2 = models.LuminosUser.objects.create_user(
             username='test2',
             first_name='Second',
             email='test2@example.com',
@@ -115,7 +115,7 @@ class TestCaseWithData(TestCase):
             emoji='🤠',
             password='test')
 
-        self.user3 = models.LunaUser.objects.create_user(
+        self.user3 = models.LuminosUser.objects.create_user(
             username='test3',
             first_name='Third',
             email='test3@example.com',
@@ -124,7 +124,7 @@ class TestCaseWithData(TestCase):
             password='test')
 
     def addOneUser(self):
-        self.user4 = models.LunaUser.objects.create_user(
+        self.user4 = models.LuminosUser.objects.create_user(
             username='test4',
             first_name='Fourth',
             email='test4@example.com',
@@ -135,10 +135,10 @@ class TestCaseWithData(TestCase):
         self.header4 = {'HTTP_AUTHORIZATION': "Bearer {}".format(self.token4)}
 
     def addLegacyUsers(self):
-        self.legacy_user = models.LunaUser.objects.create_user(
+        self.legacy_user = models.LuminosUser.objects.create_user(
             username='legacy@example.com')
 
-        self.migrated_legacy_user = models.LunaUser.objects.create_user(
+        self.migrated_legacy_user = models.LuminosUser.objects.create_user(
             username='+490123456789',
             email='migrated.legacy@example.com', )
 
@@ -169,7 +169,7 @@ class TestCaseWithData(TestCase):
             chat=self.chat1,
             sender=sender if sender else self.user,
             text="Hello World Again!",
-        )    
+        )
 
     def addFiveMessages(self, sender=None):
         return [

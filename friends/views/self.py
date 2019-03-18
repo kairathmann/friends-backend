@@ -35,7 +35,7 @@ def compare_locations(location_request_entity, user_request_data):
 class Self(APIView):
 
     def get(self, request):
-        serializer = serializers.LunaUserSerializer(request.user)
+        serializer = serializers.LuminosUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
@@ -77,5 +77,5 @@ class Self(APIView):
 
             request.user.save()
 
-        serializer = serializers.LunaUserSerializer(request.user)
+        serializer = serializers.LuminosUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)

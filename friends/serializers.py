@@ -24,9 +24,9 @@ class LocationSerializer(serializers.ModelSerializer):
         ]
 
 
-class LunaUserSerializer(serializers.ModelSerializer):
+class LuminosUserSerializer(serializers.ModelSerializer):
     '''
-    Serialize data about a LunaUser, including the auth token and other private details
+    Serialize data about a LuminosUser, including the auth token and other private details
     '''
 
     color = ColorSerializer()
@@ -35,9 +35,9 @@ class LunaUserSerializer(serializers.ModelSerializer):
         latest = models.Location.objects.filter(user=user).last()
         return LocationSerializer(latest).data
 
-    
+
     def to_representation(self, obj):
-        ret = super(LunaUserSerializer, self).to_representation(obj)
+        ret = super(LuminosUserSerializer, self).to_representation(obj)
 
         if ret['latest_location'] is None:
             del ret['latest_location']
@@ -46,7 +46,7 @@ class LunaUserSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = models.LunaUser
+        model = models.LuminosUser
         fields = [
             'id',
             'auth_token',
@@ -59,15 +59,15 @@ class LunaUserSerializer(serializers.ModelSerializer):
         ]
 
 
-class LunaUserPartnerSerializer(serializers.ModelSerializer):
+class LuminosUserPartnerSerializer(serializers.ModelSerializer):
     '''
-    Serialize data about a LunaUser, hiding the auth token and other private details
+    Serialize data about a LuminosUser, hiding the auth token and other private details
     '''
 
     color = ColorSerializer()
 
     class Meta:
-        model = models.LunaUser
+        model = models.LuminosUser
         fields = [
             'id',
             'first_name',
@@ -139,7 +139,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ChatUsersSerializer(serializers.ModelSerializer):
-    user = LunaUserPartnerSerializer()
+    user = LuminosUserPartnerSerializer()
 
     class Meta:
         model = models.ChatUsers

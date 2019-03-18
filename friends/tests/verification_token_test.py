@@ -25,7 +25,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
 
         self.assertEqual(response.status_code, 201, response.data)
         # Get new database user
-        new_user = models.LunaUser.objects.filter(is_staff=False).exclude(id=self.user.id).get()
+        new_user = models.LuminosUser.objects.filter(is_staff=False).exclude(id=self.user.id).get()
         self.assertEqual(response.data['id'], new_user.id)
         self.assertEqual(response.data['auth_token'], new_user.auth_token.key)
         self.assertEqual(response.data['first_name'], '')
@@ -49,7 +49,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         )
         self.assertEqual(response.status_code, 201, response.data)
         # Check existing database user
-        self.assertEqual(models.LunaUser.objects.count(), 1)
+        self.assertEqual(models.LuminosUser.objects.count(), 1)
         self.assertEqual(response.data['id'], self.user.id)
         self.assertEqual(response.data['auth_token'], self.user.auth_token.key)
         self.assertEqual(response.data['first_name'], self.user.first_name)
@@ -75,7 +75,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         verified phone number exists.
         """
         # Create conflicting user
-        models.LunaUser.objects.create_user(
+        models.LuminosUser.objects.create_user(
             username='+498000000000',
             first_name='conflicting_first_name',
             email='conflicting@example.com',

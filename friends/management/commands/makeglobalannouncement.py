@@ -45,7 +45,7 @@ class Command(BaseCommand):
             self.send_message()
 
     def send_message(self):
-        self.brian_bot = models.LunaUser.objects.get(is_brian_bot=True)
+        self.brian_bot = models.LuminosUser.objects.get(is_brian_bot=True)
         chat_users = models.ChatUsers.objects.filter(user=self.brian_bot)
 
         message_success_counter = 0

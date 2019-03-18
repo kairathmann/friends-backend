@@ -1558,7 +1558,7 @@ class Migration(migrations.Migration):
                 ('text', models.TextField()),
                 ('timestamp', models.DateTimeField(db_index=True, default=django.utils.timezone.now, editable=False)),
                 ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='responses', to='friends.FreeTextQuestion')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
         ),
         migrations.CreateModel(
@@ -1576,7 +1576,7 @@ class Migration(migrations.Migration):
                 ('missing_from_questions', models.TextField(blank=True)),
                 ('submitted_at', models.DateTimeField()),
                 ('token', models.CharField(max_length=32)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
         ),
         migrations.CreateModel(
@@ -1588,7 +1588,7 @@ class Migration(migrations.Migration):
                 ('full_name', models.CharField(max_length=100)),
                 ('latitude', models.FloatField()),
                 ('longitude', models.FloatField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
         ),
         migrations.CreateModel(
@@ -1598,7 +1598,7 @@ class Migration(migrations.Migration):
                 ('text', models.TextField()),
                 ('timestamp', models.DateTimeField(default=django.utils.timezone.now)),
                 ('chat', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='friends.Chat')),
-                ('sender', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('sender', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
             options={
                 'ordering': ('-id',),
@@ -1611,7 +1611,7 @@ class Migration(migrations.Migration):
                 ('country_code', models.CharField(max_length=5)),
                 ('phone_number', models.CharField(max_length=18)),
                 ('token', models.CharField(max_length=4)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
         ),
         migrations.CreateModel(
@@ -1640,7 +1640,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('timestamp', models.DateTimeField(db_index=True, default=django.utils.timezone.now, editable=False)),
                 ('answer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='responses', to='friends.SurveyAnswer')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
         ),
         migrations.CreateModel(
@@ -1658,7 +1658,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('accepted_timestamp', models.DateTimeField(db_index=True, default=django.utils.timezone.now, editable=False)),
                 ('terms', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.Terms')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser')),
             ],
         ),
         migrations.AddField(
@@ -1674,7 +1674,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='chatusers',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.LunaUser'),
         ),
         migrations.AddField(
             model_name='lunauser',

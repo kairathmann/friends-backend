@@ -104,6 +104,6 @@ class VerificationToken(APIView):
                     accepted_timestamp=now,
                 )
 
-        serializer = serializers.LunaUserSerializer(user)
+        serializer = serializers.LuminosUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

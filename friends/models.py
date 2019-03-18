@@ -51,7 +51,7 @@ class Color(models.Model):
     brian_bot = models.BooleanField(default=False)  # For the special Brian Bot color (not available to other users)
 
 
-class LunaUser(AbstractUser):
+class LuminosUser(AbstractUser):
     """
     The username is the user's phone number in E164 format.
     """
@@ -69,7 +69,7 @@ class Location(models.Model):
         full_name: value displayed for user at dropdown - 'Warszawa, Mazowieckie, Poland'
         name: short-hand value of location - 'Warszawa'
         mapbox_id: Unique identifier of Geolocation object returned from Mapbox API - storing in case of future needs - 'place.12284077938513600'
-        latitude: Floating-point value between 0 and 90 degrees - 21.03333 
+        latitude: Floating-point value between 0 and 90 degrees - 21.03333
         longitude: Floating-point value between -180 and 180 degrees - 52.21667
     """
 
@@ -78,7 +78,7 @@ class Location(models.Model):
     full_name = models.CharField(max_length=CITY_MAX_LENGTH)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    user = models.ForeignKey(LunaUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __eq__(self, other):
         return self.mapbox_id == other.mapbox_id

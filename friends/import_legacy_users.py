@@ -455,7 +455,7 @@ def import_legacy_users():
             missing_from_questions = row['What, if anything, do you think is missing from our questions?']
             submitted_at = pytz.UTC.localize(parser.parse(row['Submitted At']))
             token = row['Token'][:models.LEGACY_TOKEN_MAX_LENGTH]
-            user = models.LunaUser.objects.create_user(
+            user = models.LuminosUser.objects.create_user(
                 username=email,
                 email=email,
                 first_name=name,
