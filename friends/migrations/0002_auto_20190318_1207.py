@@ -10,9 +10,6 @@ class Migration(migrations.Migration):
     atomic = False
 
     dependencies = [
-        ('admin', '0004_auto_20190318_1207'),
-        ('authtoken', '0003_auto_20190318_1207'),
-        ('auth', '0009_alter_user_last_name_max_length'),
         ('friends', '0001_squashed_20190311'),
     ]
 
