@@ -29,7 +29,7 @@ DEBUG = True
 # ELB HealthCheck uses the EC2 instance's IP for its Host header
 local_ip = str(socket.gethostbyname(socket.gethostname()))
 
-ALLOWED_HOSTS = [local_ip, "localhost", ".meetluna.com", ".compute.amazonaws.com", ".elasticbeanstalk.com"]
+ALLOWED_HOSTS = [local_ip, "localhost", ".compute.amazonaws.com", ".elasticbeanstalk.com"]
 
 
 # Application definition
