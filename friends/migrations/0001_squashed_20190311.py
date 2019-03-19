@@ -1462,8 +1462,6 @@ def create_legacy_privacy_policy(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('friends', '0001_initial'), ('friends', '0002_round'), ('friends', '0003_auto_20190130_1046'), ('friends', '0004_chat'), ('friends', '0005_colors'), ('friends', '0006_lunauser_emoji'), ('friends', '0007_auto_20190213_1016'), ('friends', '0008_update_colors'), ('friends', '0009_surveyquestion_is_enabled'), ('friends', '0010_auto_20190221_1535'), ('friends', '0011_brian_bot_color'), ('friends', '0012_create_brian_bot'), ('friends', '0013_messages_descending'), ('friends', '0013_is_brian_bot_flag'), ('friends', '0013_create_feedback_models'), ('friends', '0014_merge_20190227_1715'), ('friends', '0015_feedback_response_validations'), ('friends', '0016_chatusers_feedback_requested'), ('friends', '0017_terms_usertermsacceptance'), ('friends', '0018_create_legacy_privacy_policy'), ('friends', '0017_lunauser_notification_id'), ('friends', '0019_merge_20190305_0950'), ('friends', '0020_location'), ('friends', '0021_extend_location_length'), ('friends', '0022_remove_lunauser_city'), ('friends', '0023_phoneverificationexemption')]
-
     dependencies = [
         ('auth', '0009_alter_user_last_name_max_length'),
     ]
