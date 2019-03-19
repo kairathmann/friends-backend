@@ -13,7 +13,7 @@ class Job(BaseJob):
         super().__init__()
         self.ignore_calendar = ignore_calendar
 
-        self.brian_bot = UserUtils.get_brian_bot()
+        self.luminos_bot = UserUtils.get_luminos_bot()
 
     def should_we_execute(self):
         if self.ignore_calendar:
@@ -56,7 +56,7 @@ class Job(BaseJob):
         luminos_bot_message = models.Message.objects.create(
             chat_id=chat.id,
             text=f'How did it go with {match_partner.first_name}? You can now submit feedback on your experience with {match_partner.first_name} to help us improve in the future.',
-            sender=self.brian_bot,
+            sender=self.luminos_bot,
         )
 
         NotificationService().dispatch_feedback_request_notification(luminos_bot_message, chat, user)

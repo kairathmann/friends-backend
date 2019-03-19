@@ -677,23 +677,23 @@ COLORS = [
 ]
 
 
-def create_brian_bot(apps, schema_editor):
+def create_luminos_bot(apps, schema_editor):
     Color = apps.get_model('friends', 'Color')
     for color in COLORS:
         Color.objects.create(hex_value=color)
 
-    # Add Brian Bot color
-    brian_bot_color = Color.objects.create(hex_value='623694', brian_bot=True)
+    # Add Luminos Bot color
+    luminos_bot_color = Color.objects.create(hex_value='623694', luminos_bot=True)
 
-    # Create Brian Bot as first LuminosUser
+    # Create Luminos Bot as first LuminosUser
     LuminosUser = apps.get_model('friends', 'LuminosUser')
     LuminosUser.objects.create(
-        username='bot',
+        username='Luminos Bot',
         emoji='⭐',
-        color=brian_bot_color,
+        color=luminos_bot_color,
         first_name='Luminos',
         is_staff=True,
-        is_brian_bot=True,
+        is_luminos_bot=True,
     )
 
 
@@ -1484,7 +1484,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('emoji', models.CharField(max_length=4)),
-                ('is_brian_bot', models.BooleanField(default=False)),
+                ('is_luminos_bot', models.BooleanField(default=False)),
                 ('notification_id', models.UUIDField(default=uuid.uuid4, unique=True)),
             ],
             options={
@@ -1518,7 +1518,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('hex_value', models.CharField(max_length=6, unique=True)),
-                ('brian_bot', models.BooleanField(default=False)),
+                ('luminos_bot', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
@@ -1700,6 +1700,6 @@ class Migration(migrations.Migration):
             unique_together={('chat', 'user')},
         ),
         migrations.RunPython(create_questions),
-        migrations.RunPython(create_brian_bot),
+        migrations.RunPython(create_luminos_bot),
         migrations.RunPython(create_legacy_privacy_policy),
     ]

@@ -36,7 +36,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         """
         This test is about posting to verification_token as an authenticated (legacy) user.
         """
-        self.removeBrianBot()
+        self.removeLuminosBot()
         response = self.client.post(
             reverse_lazy(self.view()),
             json.dumps({
@@ -98,7 +98,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         This test checks if an exempt phone number with correct token is correctly handled.
         """
         models.PhoneVerificationExemption.objects.create(
-            user=self.brianBot,
+            user=self.luminosBot,
             country_code='+49',
             phone_number='15123456789',
             token='1234',
@@ -120,7 +120,7 @@ class VerificationTokenTest(TestCaseWithAuthenticatedUser):
         This test checks if an exempt phone number with incorrect token is correctly handled.
         """
         models.PhoneVerificationExemption.objects.create(
-            user=self.brianBot,
+            user=self.luminosBot,
             country_code='+49',
             phone_number='15123456789',
             token='1234',

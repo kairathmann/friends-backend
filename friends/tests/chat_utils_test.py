@@ -7,7 +7,7 @@ class ChatUtilsTest(TestCaseWithData):
 
     def setUp(self):
         super(ChatUtilsTest, self).setUp()
-        self.addBrianBot()
+        self.addLuminosBot()
         self.addMoreUsers()
         self.removeChats()
 

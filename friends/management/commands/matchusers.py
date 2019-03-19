@@ -34,12 +34,12 @@ class Command(BaseCommand):
         # We pair the users with the most number of existing chats first because they have the fewest options.
 
         # A list of all users in descending order of existing chats.
-        user_list = list(UserUtils.exclude_brian_bot().annotate(num_chats=Count('chatusers')).order_by('-num_chats'))
+        user_list = list(UserUtils.exclude_luminos_bot().annotate(num_chats=Count('chatusers')).order_by('-num_chats'))
 
         # paired_list[i] contains the user that user_list[i] has been paired with.
         paired_list = [None for _ in range(len(user_list))]
 
-        # Brian-Bot messages to participants.
+        # Luminos Bot messages to participants.
         bot_messages = []
 
         with transaction.atomic():
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                             self.stdout.write('Pairing user {} and user {}.'.format(user1.first_name, user2.first_name))
                             paired_list[i] = user2
                             paired_list[j] = user1
-                            # Create Brian-Bot message to participants.
+                            # Create Luminos Bot message to participants.
                             bot_messages.extend(
                                 ChatUtils.create_bot_chat_creation_messages(user1, user2, options['bot-message']))
                             # Stop looking for further matches for user i.
@@ -67,9 +67,9 @@ class Command(BaseCommand):
                 self.stdout.write('User {} not paired.'.format(user_list[i].first_name))
 
         # Send push notifications for messages.
-        brian_bot = UserUtils.get_brian_bot()
+        luminos_bot = UserUtils.get_luminos_bot()
         for message in bot_messages:
             try:
-                MessageService(message.chat, brian_bot, message).on_new_message()
+                MessageService(message.chat, luminos_bot, message).on_new_message()
             except:
                 pass

@@ -5,14 +5,14 @@ from .. import models
 
 class TestCaseWithData(TestCase):
     def setUp(self):
-        # Remove users (i.e. Brian Bot) that are inserted by default
+        # Remove users (i.e. Luminos Bot) that are inserted by default
         models.LuminosUser.objects.all().delete()
 
         # Remove colors that are inserted by default
         models.Color.objects.all().delete()
         models.Color.objects.create(id=1, hex_value='AABBCC')
         models.Color.objects.create(id=2, hex_value='ABABAB')
-        models.Color.objects.create(id=3, hex_value='623694', brian_bot=True)
+        models.Color.objects.create(id=3, hex_value='623694', luminos_bot=True)
 
         # Remove questions that are inserted by default
         models.SurveyQuestion.objects.all().delete()
@@ -28,19 +28,19 @@ class TestCaseWithData(TestCase):
         models.FeedbackResponse.objects.all().delete()
         models.Location.objects.all().delete()
 
-    def addBrianBot(self):
-        brian_bot_color = models.Color.objects.get(brian_bot=True)
+    def addLuminosBot(self):
+        luminos_bot_color = models.Color.objects.get(luminos_bot=True)
 
-        self.brianBot = models.LuminosUser.objects.create_user(
-            username='Brian-Bot',
+        self.luminosBot = models.LuminosUser.objects.create_user(
+            username='Luminos-Bot',
             emoji='⭐',
-            color=brian_bot_color,
+            color=luminos_bot_color,
             is_staff=True,
-            is_brian_bot=True,
+            is_luminos_bot=True,
         )
 
-    def removeBrianBot(self):
-        models.LuminosUser.objects.get(is_brian_bot=True).delete()
+    def removeLuminosBot(self):
+        models.LuminosUser.objects.get(is_luminos_bot=True).delete()
 
     def addSurvey(self, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(

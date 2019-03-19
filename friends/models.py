@@ -48,7 +48,7 @@ class Color(models.Model):
     A color is a user selected color that is used as a part of user avatar and used to style parts of application according to user selection.
     """
     hex_value = models.CharField(max_length=COLOR_MAX_LENGTH, unique=True)
-    brian_bot = models.BooleanField(default=False)  # For the special Brian Bot color (not available to other users)
+    luminos_bot = models.BooleanField(default=False)  # For the special Luminos Bot color (not available to other users)
 
 
 class LuminosUser(AbstractUser):
@@ -58,7 +58,7 @@ class LuminosUser(AbstractUser):
 
     color = models.ForeignKey(Color, null=True, on_delete=models.PROTECT)
     emoji = models.CharField(max_length=EMOJI_MAX_LENGTH)
-    is_brian_bot = models.BooleanField(default=False)
+    is_luminos_bot = models.BooleanField(default=False)
     notification_id = models.UUIDField(null=False, default=uuid.uuid4, unique=True)
 
 
@@ -346,8 +346,8 @@ def handle_new_user(sender, instance=None, created=False, **kwargs):
         # Auth Token
         Token.objects.get_or_create(user=instance)
 
-        # Create a Brian Bot Chat with any non-staff user.
-        # Staff users are the Brian Bot itself and any superusers created on the commandline.
+        # Create a Luminos Bot Chat with any non-staff user.
+        # Staff users are the Luminos Bot itself and any superusers created on the commandline.
         if not instance.is_staff:
-            brian_bot = UserUtils.get_brian_bot()
-            ChatUtils.create_chat([brian_bot, instance], 'Welcome to Luminos! If you have any questions, suggestions, or even if you just want to chat, you can message us anytime!')
+            luminos_bot = UserUtils.get_luminos_bot()
+            ChatUtils.create_chat([luminos_bot, instance], 'Welcome to Luminos! If you have any questions, suggestions, or even if you just want to chat, you can message us anytime!')

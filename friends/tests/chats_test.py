@@ -113,21 +113,3 @@ class ChatsTest(TestCaseWithAuthenticatedUser):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(0, len(response.data))
-
-    # TODO Re-add tests when dogfooding via pairing everyone with everyone has concluded.
-    # def test_chat_with_brian_bot_created_for_user(self):
-    #     self.addOneUser()
-    #
-    #     response = self.client.get(
-    #         reverse_lazy(self.view()),
-    #         content_type='application/json',
-    #         **self.header4,
-    #     )
-    #
-    #     chat_user_set = response.data[0].get('chatusers_set')
-    #
-    #     self.assertEqual(response.status_code, 200)
-    #
-    #     self.assertEqual(1, len(response.data))
-    #     self.assertEqual(chat_user_set[0]['user']['id'], self.brianBot.id)
-    #     self.assertEqual(chat_user_set[1]['user']['id'], self.user4.id)

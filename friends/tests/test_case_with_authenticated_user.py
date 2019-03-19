@@ -5,5 +5,5 @@ class TestCaseWithAuthenticatedUser(TestCaseWithData):
 
     def setUp(self):
         super(TestCaseWithAuthenticatedUser, self).setUp()
-        self.addBrianBot()
+        self.addLuminosBot()
         self.addAuthenticatedUser()

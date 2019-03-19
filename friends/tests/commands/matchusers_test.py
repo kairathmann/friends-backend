@@ -11,7 +11,7 @@ class MatchUsersTest(TestCaseWithData):
 
     def setUp(self):
         super(MatchUsersTest, self).setUp()
-        self.addBrianBot()
+        self.addLuminosBot()
         self.addMoreUsers()
 
     def test_match_2_unmatched_users(self):
@@ -29,16 +29,16 @@ class MatchUsersTest(TestCaseWithData):
             self.user2.first_name, self.user3.first_name
         ))
 
-        bot_user2_chat = ChatUtils.find_chat([self.brianBot, self.user2])
+        bot_user2_chat = ChatUtils.find_chat([self.luminosBot, self.user2])
         bot_user2_message = bot_user2_chat.messages.first()
-        self.assertEqual(bot_user2_message.sender, self.brianBot)
+        self.assertEqual(bot_user2_message.sender, self.luminosBot)
         self.assertEqual(bot_user2_message.text, 'my-bot-message {} {}'.format(
             self.user2.first_name, self.user3.first_name
         ))
 
-        bot_user3_chat = ChatUtils.find_chat([self.brianBot, self.user3])
+        bot_user3_chat = ChatUtils.find_chat([self.luminosBot, self.user3])
         bot_user3_message = bot_user3_chat.messages.first()
-        self.assertEqual(bot_user3_message.sender, self.brianBot)
+        self.assertEqual(bot_user3_message.sender, self.luminosBot)
         self.assertEqual(bot_user3_message.text, 'my-bot-message {} {}'.format(
             self.user3.first_name, self.user2.first_name
         ))

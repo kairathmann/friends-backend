@@ -12,17 +12,17 @@ TEXT_COLORS = {
 class Command(BaseCommand):
     """
     The 'makeglobalannouncement' custom command bulk sends a
-    one-to-one message from Brian to every active user.
+    one-to-one message from Luminos to every active user.
     :param args: message_text (str).
     :flag args: --test (bool).
     :param options: None.
     :return: Nothing.
     """
-    help = 'Sends global message to all Luna users via Brian Bot'
+    help = 'Sends global message to all Luna users via Luminos Bot'
 
     def add_arguments(self, parser):
         parser.add_argument('message_text',
-                            help='The message text to be sent from Brian Bot. '
+                            help='The message text to be sent from Luminos Bot. '
                                  'Can contain placeholder {user} for the (recipient) user\'s first_name.'
         )
         parser.add_argument('-t', '--test',
@@ -45,8 +45,8 @@ class Command(BaseCommand):
             self.send_message()
 
     def send_message(self):
-        self.brian_bot = models.LuminosUser.objects.get(is_brian_bot=True)
-        chat_users = models.ChatUsers.objects.filter(user=self.brian_bot)
+        self.luminos_bot = models.LuminosUser.objects.get(is_luminos_bot=True)
+        chat_users = models.ChatUsers.objects.filter(user=self.luminos_bot)
 
         message_success_counter = 0
         for chat_user in chat_users:
@@ -54,13 +54,13 @@ class Command(BaseCommand):
             try:
                 message = models.Message.objects.create(
                     chat=chat_user.chat,
-                    sender=self.brian_bot,
+                    sender=self.luminos_bot,
                     text=self.message_text.format(user=recipient_first_name),
                 )
             except IntegrityError as e:
                 self.print_log(f'{e}. Error sending message to chat with id {chat_user.chat.id}', 'error')
             else:
-                MessageService(chat_user.chat, self.brian_bot, message).on_new_message()
+                MessageService(chat_user.chat, self.luminos_bot, message).on_new_message()
                 message_success_counter += 1
 
         self.print_log(f'Message successfully sent to {message_success_counter}/{chat_users.count()} chats', 'success')
@@ -72,7 +72,7 @@ class Command(BaseCommand):
         return input()
 
     def get_recipient_first_name(self, chat_user):
-        recipient_chat_user = models.ChatUsers.objects.filter(chat=chat_user.chat).exclude(user=self.brian_bot).first()
+        recipient_chat_user = models.ChatUsers.objects.filter(chat=chat_user.chat).exclude(user=self.luminos_bot).first()
         return recipient_chat_user.user.first_name
 
     def print_log(self, message_text, message_type):

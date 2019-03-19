@@ -13,7 +13,7 @@ class ChatUtils:
     @transaction.atomic
     def create_bot_chat_creation_messages(user1, user2, message_text):
         """
-        Creates messages from Brian Bot to two users that a chat between them has been created.
+        Creates messages from Luminos Bot to two users that a chat between them has been created.
         No push notifications are sent for these message.
         :param user1: A user.
         :param user2: A user.
@@ -24,13 +24,13 @@ class ChatUtils:
         :return: The two created messages.
         """
         bot_messages = []
-        brian_bot = UserUtils.get_brian_bot()
+        luminos_bot = UserUtils.get_luminos_bot()
         for u1, u2 in [[user1, user2], [user2, user1]]:
-            chat = ChatUtils.find_chat([brian_bot, u1])
+            chat = ChatUtils.find_chat([luminos_bot, u1])
             message = models.Message.objects.create(
                 chat=chat,
                 text=message_text.format(user1=u1.first_name, user2=u2.first_name),
-                sender=brian_bot,
+                sender=luminos_bot,
             )
             bot_messages.append(message)
         return bot_messages

@@ -8,6 +8,6 @@ from .. import serializers
 class Colors(APIView):
 
     def get(self, request):
-        colors = models.Color.objects.filter(brian_bot=False).order_by('id')
+        colors = models.Color.objects.filter(luminos_bot=False).order_by('id')
         serializer = serializers.ColorSerializer(colors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
