@@ -42,7 +42,7 @@ class TestCaseWithData(TestCase):
     def removeBrianBot(self):
         models.LunaUser.objects.get(is_brian_bot=True).delete()
 
-    def addSurvey(self, add_responses=True):
+    def addSurvey(self, user=None, add_responses=True):
         self.question1 = models.SurveyQuestion.objects.create(
             text='text1',
         )
@@ -70,16 +70,20 @@ class TestCaseWithData(TestCase):
             order_index=0,
         )
         if add_responses:
-            self.response2 = models.SurveyResponse.objects.create(
-                user=self.user,
-                answer=self.answer2a,
-            )
+            self.addResponses(self.user)
 
-            # Response 2b is current response now as is created a few ms after response2
-            self.response2b = models.SurveyResponse.objects.create(
-                user=self.user,
-                answer=self.answer2b,
-            )
+    def addResponses(self, user=None):
+        if user is None: user = self.user
+        self.response2 = models.SurveyResponse.objects.create(
+            user=user,
+            answer=self.answer2a,
+        )
+
+        # Response 2b is current response now
+        self.response2b = models.SurveyResponse.objects.create(
+            user=user,
+            answer=self.answer2b,
+        )
 
     def addMultiResponseQuestion(self):
         self.multi_response_question1 = models.SurveyQuestion.objects.create(
